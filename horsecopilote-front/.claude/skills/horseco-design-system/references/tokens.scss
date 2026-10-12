@@ -1,0 +1,115 @@
+// HorseCo-Pilote — design tokens
+// À copier dans src/styles/_tokens.scss puis importer dans src/styles.scss :
+//   @use 'styles/tokens';
+//
+// Polices à ajouter dans src/index.html (<head>) :
+//   <link rel="preconnect" href="https://fonts.googleapis.com">
+//   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+//   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+
+:root {
+  // ---------- Couleurs : marque ----------
+  --hc-brand-primary: #1f3d2b;
+  --hc-brand-primary-hover: #2c5239;
+  --hc-brand-primary-soft: #e3ece4;
+  --hc-brand-secondary: #8b5e3c;
+
+  // ---------- Couleurs : fonds ----------
+  --hc-bg-page: #f7f3ea;
+  --hc-bg-surface: #ffffff;
+  --hc-bg-subtle: #f1ebdd;
+  --hc-bg-disabled: #eeece7;
+  --hc-bg-sidebar: #1f3d2b;
+
+  // ---------- Couleurs : bordures ----------
+  --hc-border-default: #e4daca;
+  --hc-border-strong: #cdbfa8;
+
+  // ---------- Couleurs : texte ----------
+  --hc-text-primary: #1e2420;
+  --hc-text-muted: #6b6f68;
+  --hc-text-disabled: #a9a79f;
+  --hc-text-inverse: #ffffff;
+  --hc-text-sidebar-muted: #b9cbbe;
+
+  // ---------- Couleurs : statuts ----------
+  --hc-status-success: #2f7a4b;
+  --hc-status-success-soft: #dff0e5;
+  --hc-status-warning: #9a6a00;
+  --hc-status-warning-soft: #fcefc7;
+  --hc-status-danger: #b4423a;
+  --hc-status-danger-soft: #f8e1de;
+  --hc-status-info: #2e5e8c;
+  --hc-status-info-soft: #dfeaf5;
+
+  // ---------- Couleurs : surbrillance (inscription tardive) ----------
+  --hc-highlight-late: #f2c14e;
+  --hc-highlight-late-soft: #fff4d6;
+
+  // ---------- Typographie ----------
+  --hc-font-display: 'Fraunces', Georgia, serif;
+  --hc-font-body: 'DM Sans', system-ui, sans-serif;
+
+  --hc-text-display: 600 32px/40px var(--hc-font-display);
+  --hc-text-title-1: 600 24px/32px var(--hc-font-display);
+  --hc-text-title-2: 600 18px/26px var(--hc-font-body);
+  --hc-text-body: 400 14px/20px var(--hc-font-body);
+  --hc-text-body-strong: 600 14px/20px var(--hc-font-body);
+  --hc-text-label: 500 13px/18px var(--hc-font-body);
+  --hc-text-caption: 500 12px/16px var(--hc-font-body);
+
+  // ---------- Espacements (grille 4 px) ----------
+  --hc-space-1: 4px;
+  --hc-space-2: 8px;
+  --hc-space-2-5: 10px;
+  --hc-space-3: 12px;
+  --hc-space-3-5: 14px;
+  --hc-space-4: 16px;
+  --hc-space-5: 20px;
+  --hc-space-6: 24px;
+  --hc-space-7: 28px;
+  --hc-space-8: 32px;
+  --hc-space-10: 40px;
+
+  // ---------- Rayons ----------
+  --hc-radius-sm: 8px;    // boutons, champs, éléments de menu
+  --hc-radius-md: 10px;   // encadrés, blocs de leçon, lignes cheval
+  --hc-radius-lg: 12px;   // cartes, tableaux
+  --hc-radius-xl: 16px;   // modales, carte de connexion
+  --hc-radius-pill: 999px; // badges, puces de choix
+
+  // ---------- Ombres & voile ----------
+  --hc-shadow-card: 0 12px 32px rgba(31, 36, 31, 0.08);
+  --hc-shadow-modal: 0 20px 48px rgba(13, 20, 15, 0.2);
+  --hc-scrim: rgba(18, 26, 20, 0.45);
+
+  // ---------- Layout ----------
+  --hc-sidebar-width: 240px;
+  --hc-page-padding: 32px 40px;
+  --hc-focus-ring: 2px solid var(--hc-highlight-late);
+}
+
+// ---------- Base ----------
+html,
+body {
+  margin: 0;
+  background: var(--hc-bg-page);
+  color: var(--hc-text-primary);
+  font: var(--hc-text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: var(--hc-focus-ring);
+  outline-offset: 2px;
+}
+
+// ---------- Classes typographiques ----------
+.hc-display { font: var(--hc-text-display); }
+.hc-title-1 { font: var(--hc-text-title-1); }
+.hc-title-2 { font: var(--hc-text-title-2); }
+.hc-body { font: var(--hc-text-body); }
+.hc-body-strong { font: var(--hc-text-body-strong); }
+.hc-label { font: var(--hc-text-label); }
+.hc-caption { font: var(--hc-text-caption); }
+.hc-muted { color: var(--hc-text-muted); }
