@@ -1,0 +1,80 @@
+<div class="login-container">
+  <section class="brand-panel">
+    <header class="brand-header">
+      <div class="logo-badge">H</div>
+      <span class="brand-title">HorseCo-Pilote</span>
+    </header>
+
+    <div class="brand-content">
+      <h1 class="headline">
+        Gérez votre centre équestre, du créneau au cheval.
+      </h1>
+
+      <ul class="features-list">
+        @for (item of features; track item) {
+          <li>
+            <span class="dot"></span>
+            <span>{{ item }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="form-panel">
+    <mat-card class="auth-card">
+      <div class="card-header">
+        <h2 class="card-title">Connexion</h2>
+        <p class="card-subtitle">
+          Accédez à votre espace membre, coach ou administrateur.
+        </p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="input-group">
+          <label class="custom-label" for="email">Adresse e-mail</label>
+          <mat-form-field appearance="outline" class="full-width">
+            <input
+              matInput
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="votre@email.fr"
+            />
+          </mat-form-field>
+          @if (loginForm.get('email')?.touched && loginForm.get('email')?.invalid) {
+            <span class="field-error">Veuillez renseigner un email valide</span>
+          }
+        </div>
+
+        <div class="input-group">
+          <label class="custom-label" for="password">Mot de passe</label>
+          <mat-form-field appearance="outline" class="full-width">
+            <input
+              matInput
+              id="password"
+              type="password"
+              formControlName="password"
+            />
+          </mat-form-field>
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+            <span class="field-error">Le mot de passe est obligatoire</span>
+          }
+        </div>
+
+        <button
+          mat-flat-button
+          type="submit"
+          class="submit-button"
+          [disabled]="loginForm.invalid"
+        >
+          Se connecter
+        </button>
+      </form>
+
+      <div class="info-banner">
+        Pas encore de compte ? Les comptes sont créés par l'administrateur du centre.
+      </div>
+    </mat-card>
+  </section>
+</div>
