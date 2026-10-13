@@ -1,0 +1,30 @@
+dialog {
+  box-sizing: border-box;
+  max-width: calc(100vw - var(--hc-space-10));
+  padding: var(--hc-space-7);
+  border: none;
+  border-radius: var(--hc-radius-xl);
+  background: var(--hc-bg-surface);
+  box-shadow: var(--hc-shadow-modal);
+  color: var(--hc-text-primary);
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hc-space-5);
+  }
+
+  &::backdrop {
+    background: var(--hc-scrim);
+  }
+}
+
+h2 {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--hc-space-3);
+}

@@ -44,3 +44,6 @@ __screenshots__/
 Thumbs.db
 
 .claude/settings.local.json
+
+### Playwright MCP ###
+.playwright-mcp/

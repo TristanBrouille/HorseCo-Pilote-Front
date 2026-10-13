@@ -1,0 +1,38 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px var(--hc-space-2-5);
+  border-radius: var(--hc-radius-pill);
+  font: var(--hc-text-caption);
+  white-space: nowrap;
+}
+
+:host(.tone-neutral) {
+  background: var(--hc-bg-subtle);
+  color: var(--hc-text-muted);
+}
+
+:host(.tone-success) {
+  background: var(--hc-status-success-soft);
+  color: var(--hc-status-success);
+}
+
+:host(.tone-warning) {
+  background: var(--hc-status-warning-soft);
+  color: var(--hc-status-warning);
+}
+
+:host(.tone-danger) {
+  background: var(--hc-status-danger-soft);
+  color: var(--hc-status-danger);
+}
+
+:host(.tone-info) {
+  background: var(--hc-status-info-soft);
+  color: var(--hc-status-info);
+}
+
+:host(.tone-brand) {
+  background: var(--hc-brand-primary-soft);
+  color: var(--hc-brand-primary);
+}
