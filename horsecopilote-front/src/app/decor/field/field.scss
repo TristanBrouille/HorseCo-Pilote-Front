@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--hc-text-primary);
+}
+
+// Projected controls are not in this component's view, hence ::ng-deep scoped under :host.
+:host ::ng-deep :is(input, select) {
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--hc-space-2-5) var(--hc-space-3);
+  border: 1px solid var(--hc-border-strong);
+  border-radius: var(--hc-radius-sm);
+  background: var(--hc-bg-surface);
+  color: var(--hc-text-primary);
+  font: var(--hc-text-body);
+
+  &:focus-visible {
+    border-color: var(--hc-brand-primary);
+  }
+}
+
+.has-error ::ng-deep :is(input, select) {
+  border-color: var(--hc-status-danger);
+}
+
+.message {
+  font: var(--hc-text-caption);
+  color: var(--hc-text-muted);
+}
+
+.error {
+  color: var(--hc-status-danger);
+}
