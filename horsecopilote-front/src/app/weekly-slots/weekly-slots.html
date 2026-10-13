@@ -1,0 +1,172 @@
+<main class="page">
+  <hc-page-header
+    title="Créneaux hebdomadaires"
+    subtitle="Le planning des cours d'1 heure, répété chaque semaine. Les membres s'inscrivent à un créneau pour un an."
+  >
+    <button hc-button actions type="button" (click)="openCreate()">Ajouter un créneau</button>
+  </hc-page-header>
+
+  @if (loadError()) {
+    <p class="error-banner" role="alert">{{ loadError() }}</p>
+  }
+
+  @if (!slots().length && !loadError()) {
+    <p class="hc-body hc-muted">
+      Aucun créneau pour l'instant. Cliquez sur une case du calendrier pour créer le premier.
+    </p>
+  }
+
+  <section
+    class="calendar"
+    aria-label="Planning hebdomadaire des créneaux"
+    [style.--hours]="hours().length"
+  >
+    <div class="corner"></div>
+    @for (column of columns(); track column.day) {
+      <div class="day-header hc-title-2">{{ dayLabels[column.day] }}</div>
+    }
+
+    <div class="hour-labels" aria-hidden="true">
+      @for (hour of hours(); track hour) {
+        <span class="hour-label hc-caption">{{ timeLabel(hour) }}</span>
+      }
+    </div>
+
+    @for (column of columns(); track column.day) {
+      <div class="day-column" role="group" [attr.aria-label]="dayLabels[column.day]">
+        @for (time of halfHours(); track time) {
+          <button
+            type="button"
+            class="hour-cell"
+            [attr.aria-label]="
+              'Ajouter un créneau le ' + dayLabels[column.day] + ' à ' + timeLabel(time)
+            "
+            (click)="openCreate(column.day, time)"
+          ></button>
+        }
+        @for (block of column.blocks; track block.slot.id) {
+          <button
+            type="button"
+            class="slot-block"
+            [style.--top]="block.top"
+            [style.--height]="block.height"
+            [style.--lane]="block.lane"
+            [style.--lanes]="block.lanes"
+            [attr.aria-label]="
+              'Modifier le créneau du ' +
+              dayLabels[column.day] +
+              ' ' +
+              timeRange(block.slot.startTime, block.slot.endTime) +
+              ' avec ' +
+              block.slot.coach.firstName +
+              ' ' +
+              block.slot.coach.lastName
+            "
+            (click)="openEdit(block.slot)"
+          >
+            <span class="block-top">
+              <span class="hc-caption hc-muted">
+                {{ timeRange(block.slot.startTime, block.slot.endTime) }}
+              </span>
+              <hc-badge tone="brand">{{ levelLabel(block.slot.requiredLevel) }}</hc-badge>
+            </span>
+            <span class="coach hc-body-strong">
+              {{ block.slot.coach.firstName }} {{ block.slot.coach.lastName }}
+            </span>
+            <span class="hc-caption hc-muted">{{ block.slot.maxCapacity }} places</span>
+          </button>
+        }
+      </div>
+    }
+  </section>
+</main>
+
+<hc-modal
+  [title]="editedSlot() ? 'Modifier le créneau' : 'Ajouter un créneau'"
+  [width]="600"
+  [(open)]="formOpen"
+>
+  <form id="slot-form" class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <hc-field
+      class="full"
+      label="Coach"
+      [error]="fieldError('coachId')"
+      [hint]="coaches().length ? null : 'Aucun coach enregistré pour le moment.'"
+    >
+      <select formControlName="coachId">
+        <option [ngValue]="null" disabled>Choisir un coach</option>
+        @for (coach of coaches(); track coach.id) {
+          <option [ngValue]="coach.id">{{ coach.firstName }} {{ coach.lastName }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Jour" [error]="fieldError('dayOfWeek')">
+      <select formControlName="dayOfWeek">
+        @for (day of days; track day) {
+          <option [ngValue]="day">{{ dayLabels[day] }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Heure de début" hint="Durée : 1 heure" [error]="fieldError('startTime')">
+      <select formControlName="startTime">
+        @for (time of startTimes; track time) {
+          <option [ngValue]="time">{{ time }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Places" hint="12 au maximum" [error]="fieldError('maxCapacity')">
+      <input type="number" min="1" max="12" formControlName="maxCapacity" />
+    </hc-field>
+    <hc-field label="Niveau requis (galop)" [error]="fieldError('requiredLevel')">
+      <input type="number" min="0" max="7" formControlName="requiredLevel" />
+    </hc-field>
+  </form>
+  @if (actionError()) {
+    <p class="error-banner" role="alert">{{ actionError() }}</p>
+  }
+  @if (editedSlot(); as slot) {
+    <button
+      hc-button
+      actions
+      class="delete-action"
+      variant="danger"
+      type="button"
+      (click)="askDelete(slot)"
+    >
+      Supprimer le créneau
+    </button>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="formOpen.set(false)">
+    Annuler
+  </button>
+  <button hc-button actions type="submit" form="slot-form" [disabled]="saving()">
+    {{ editedSlot() ? 'Enregistrer' : 'Ajouter le créneau' }}
+  </button>
+</hc-modal>
+
+<hc-modal title="Supprimer le créneau" [(open)]="deleteOpen">
+  @if (slotToDelete(); as slot) {
+    <p class="hc-body">
+      Le créneau du {{ dayLabels[slot.dayOfWeek].toLowerCase() }}
+      {{ timeRange(slot.startTime, slot.endTime) }} avec {{ slot.coach.firstName }}
+      {{ slot.coach.lastName }} sera supprimé. Les inscriptions des membres à ce créneau seront
+      aussi supprimées.
+    </p>
+  }
+  @if (actionError()) {
+    <p class="error-banner" role="alert">{{ actionError() }}</p>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="deleteOpen.set(false)">
+    Annuler
+  </button>
+  <button
+    hc-button
+    actions
+    variant="danger"
+    type="button"
+    [disabled]="saving()"
+    (click)="confirmDelete()"
+  >
+    Supprimer
+  </button>
+</hc-modal>

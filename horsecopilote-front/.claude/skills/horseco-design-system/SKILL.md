@@ -1,6 +1,6 @@
 ---
 name: horseco-design-system
-description: HorseCo-Pilote visual identity for the Angular front end — colors, typography, spacing, shared UI components (button, badge, field, sidebar, slot card, lesson block, horse option, table, modal) and business display rules (greyed-out and highlighted states). Use it whenever you create or change a screen, component, style or page in the front end, even if the request does not mention design (for example "add the horses page", "build the enrollment screen", "create a table component").
+description: HorseCo-Pilote Angular front end — folder architecture (same as the EPF Core front: one folder per screen with its HTTP service, model/, decor/), visual identity — colors, typography, spacing, shared UI components (button, badge, field, sidebar, slot card, lesson block, horse option, AG Grid tables, modal) and business display rules (greyed-out and highlighted states). Use it whenever you create or change a screen, component, style or page in the front end, even if the request does not mention design (for example "add the horses page", "build the enrollment screen", "create a table component").
 ---
 
 # HorseCo-Pilote — Design system (Angular front end)
@@ -10,7 +10,7 @@ This skill makes every screen of the front end follow **the same visual identity
 Read these references before writing code:
 
 - `references/tokens.scss`: the CSS custom properties (colors, typography, radii, shadows, spacing) to copy as-is into `src/styles/_tokens.scss`.
-- `references/components.md`: the specification of every shared component (API, variants, states, sizes) and of the page patterns (table, modal, login).
+- `references/components.md`: the specification of every shared component (API, variants, states, sizes) and of the page patterns (AG Grid table, modal, login). Every data table uses AG Grid, themed with the tokens.
 
 ## 1. Identity
 
@@ -22,7 +22,7 @@ Read these references before writing code:
 
 1. **No hard-coded color, font size, radius or shadow** in a component: always `var(--hc-…)` from `_tokens.scss`. If a token is missing, add it to `_tokens.scss` (and mention it) instead of writing a raw value.
 2. **Fonts**: *Fraunces* (SemiBold 600) only for screen and modal titles; *DM Sans* for everything else. Never Inter, Roboto or the system font.
-3. **Reuse the shared components** in `src/app/shared/ui/` (selector prefix `hc-`) before creating a new one. Anything used on two screens becomes a shared component.
+3. **Reuse the shared components** in `src/app/decor/` (selector prefix `hc-`) before creating a new one. Anything used on two screens becomes a shared component.
 4. **Business states come from the API**: the front end never recomputes business rules. It displays `selectable` + reason (greyed-out horse), the slot level (out-of-level slot greyed out) and `hasPendingMembers` (highlighted lesson) exactly as the back end returns them.
 5. **A greyed-out item always explains why**: visible reason (`--hc-text-disabled` text + reason in `--hc-status-danger`), never a silent disabled element.
 6. **Accessibility**: WCAG AA contrast minimum, visible focus (`outline: 2px solid var(--hc-highlight-late)` + `outline-offset: 2px`), greyed-out items with `aria-disabled="true"` and their reason readable by screen readers.
@@ -89,7 +89,7 @@ Matching utility classes: `.hc-display`, `.hc-title-1`, `.hc-title-2`, `.hc-body
 | `Location` | `CARRIERE`, `PRE`, `MANEGE`, `BOX`, `PADOCK` | Carrière, Pré, Manège, Box, Padock | `body` text |
 | Level | integer | "Galop 4" | brand (neutral when greyed out) |
 
-Keep these mappings in a single file (`src/app/shared/ui/labels.ts`): label + badge tone per value.
+Keep these mappings in a single file (`src/app/decor/labels.ts`): label + badge tone per value.
 
 ## 8. Business visual states
 
@@ -113,7 +113,11 @@ Keep these mappings in a single file (`src/app/shared/ui/labels.ts`): label + ba
 
 1. Re-read `CLAUDE.md` (business rules for the screen) and `references/components.md`.
 2. Check that `src/styles/_tokens.scss` exists and is imported in `src/styles.scss`, and that the fonts are loaded in `src/index.html` (otherwise add them from `references/tokens.scss`).
-3. List the shared components you need; create the missing ones in `src/app/shared/ui/` following their specification.
-4. Build the screen in `src/app/features/<feature>/` with the layout from § 6, using only tokens and shared components.
+3. List the shared components you need; create the missing ones in `src/app/decor/` following their specification.
+4. Build the screen in `src/app/<screen>/` (component + `<screen>-service.ts`, interfaces in `src/app/model/`, see `references/architecture.md`) with the layout from § 6, using only tokens and shared components.
 5. Check: no hard-coded values (`grep -nE "#[0-9a-fA-F]{3,6}|[0-9]+px"` on component `.scss` files, excluding `_tokens.scss`), greyed-out states show their reason, focus is visible, UI text is in French.
 6. Run `npm test` and `npm run build`.
+
+## 11. Git
+
+Never add Claude as a co-author of commits: no `Co-Authored-By: Claude …` trailer (nor any other Claude/Anthropic attribution) in commit messages or pull request descriptions.
