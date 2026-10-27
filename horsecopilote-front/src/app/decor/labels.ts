@@ -1,4 +1,4 @@
-import { DayOfWeek } from '../model/weekly-slot';
+import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
 
 export const DAY_LABELS: Record<DayOfWeek, string> = {
   MONDAY: 'Lundi',

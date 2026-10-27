@@ -10,21 +10,7 @@ import {
 
 @Component({
   selector: 'hc-modal',
-  template: `
-    <dialog
-      #dialog
-      [style.width.px]="width()"
-      [attr.aria-label]="title()"
-      (close)="open.set(false)"
-      (click)="closeOnScrim($event)"
-    >
-      <h2 class="hc-title-1">{{ title() }}</h2>
-      <ng-content />
-      <div class="actions">
-        <ng-content select="[actions]" />
-      </div>
-    </dialog>
-  `,
+  templateUrl: './modal.html',
   styleUrl: './modal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

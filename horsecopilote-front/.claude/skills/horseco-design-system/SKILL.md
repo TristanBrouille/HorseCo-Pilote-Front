@@ -1,6 +1,6 @@
 ---
 name: horseco-design-system
-description: HorseCo-Pilote Angular front end — folder architecture (same as the EPF Core front: one folder per screen with its HTTP service, model/, decor/), visual identity — colors, typography, spacing, shared UI components (button, badge, field, sidebar, slot card, lesson block, horse option, AG Grid tables, modal) and business display rules (greyed-out and highlighted states). Use it whenever you create or change a screen, component, style or page in the front end, even if the request does not mention design (for example "add the horses page", "build the enrollment screen", "create a table component").
+description: HorseCo-Pilote Angular front end — folder architecture (same as the EPF Core front: one folder per screen with its HTTP service and model file, decor/), visual identity — colors, typography, spacing, shared UI components (button, badge, field, sidebar, slot card, lesson block, horse option, AG Grid tables, modal) and business display rules (greyed-out and highlighted states). Use it whenever you create or change a screen, component, style or page in the front end, even if the request does not mention design (for example "add the horses page", "build the enrollment screen", "create a table component").
 ---
 
 # HorseCo-Pilote — Design system (Angular front end)
@@ -113,10 +113,10 @@ Keep these mappings in a single file (`src/app/decor/labels.ts`): label + badge 
 
 1. Re-read `CLAUDE.md` (business rules for the screen) and `references/components.md`.
 2. Check that `src/styles/_tokens.scss` exists and is imported in `src/styles.scss`, and that the fonts are loaded in `src/index.html` (otherwise add them from `references/tokens.scss`).
-3. List the shared components you need; create the missing ones in `src/app/decor/` following their specification.
-4. Build the screen in `src/app/<screen>/` (component + `<screen>-service.ts`, interfaces in `src/app/model/`, see `references/architecture.md`) with the layout from § 6, using only tokens and shared components.
+3. List the shared components you need; create the missing ones in `src/app/decor/` following their specification, each with its template in a `.html` file and its styles in a `.scss` file (no inline `template` or `styles`).
+4. Build the screen in `src/app/<screen>/` (component + `<screen>-service.ts` + `<screen>Model.ts` for the interfaces, no `model/` folder, back URLs without `/api`, see `references/architecture.md`) with the layout from § 6, using only tokens and shared components.
 5. Check: no hard-coded values (`grep -nE "#[0-9a-fA-F]{3,6}|[0-9]+px"` on component `.scss` files, excluding `_tokens.scss`), greyed-out states show their reason, focus is visible, UI text is in French.
-6. Run `npm test` and `npm run build`.
+6. Run `npm run build`, and `npm test` if the project has tests (front tests are optional).
 
 ## 11. Git
 

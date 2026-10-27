@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { WeeklySlot, WeeklySlotRequest } from '../model/weekly-slot';
+import { WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
 
 @Injectable({ providedIn: 'root' })
 export class WeeklySlotsService {
-  private readonly baseUrl = 'http://localhost:8080/api/weekly-slots';
+  private readonly baseUrl = 'http://localhost:8080/weekly-slots';
   private readonly http = inject(HttpClient);
 
   getAll(): Promise<WeeklySlot[]> {

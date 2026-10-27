@@ -1,4 +1,4 @@
-import { WeeklySlot } from '../model/weekly-slot';
+import { WeeklySlot } from '../weeklySlotModel';
 import { calendarHours, dayColumns } from './calendar-layout';
 
 const slot = (id: number, dayOfWeek: WeeklySlot['dayOfWeek'], start: string, end: string) =>

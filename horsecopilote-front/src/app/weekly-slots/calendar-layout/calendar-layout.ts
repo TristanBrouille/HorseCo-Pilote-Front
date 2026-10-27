@@ -1,4 +1,4 @@
-import { DayOfWeek, WeeklySlot } from '../model/weekly-slot';
+import { DayOfWeek, WeeklySlot } from '../weeklySlotModel';
 
 export interface SlotBlock {
   slot: WeeklySlot;

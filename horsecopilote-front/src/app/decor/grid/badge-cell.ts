@@ -8,7 +8,7 @@ export type BadgeCellParams = ICellRendererParams & { tone?: BadgeTone };
 @Component({
   selector: 'hc-badge-cell',
   imports: [Badge],
-  template: `<hc-badge [tone]="tone()">{{ label() }}</hc-badge>`,
+  templateUrl: './badge-cell.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BadgeCell implements ICellRendererAngularComp {

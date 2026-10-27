@@ -2,17 +2,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'hc-field',
-  template: `
-    <label class="field" [class.has-error]="error()">
-      <span class="hc-label">{{ label() }}</span>
-      <ng-content />
-      @if (error()) {
-        <span class="message error" role="alert">{{ error() }}</span>
-      } @else if (hint()) {
-        <span class="message">{{ hint() }}</span>
-      }
-    </label>
-  `,
+  templateUrl: './field.html',
   styleUrl: './field.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

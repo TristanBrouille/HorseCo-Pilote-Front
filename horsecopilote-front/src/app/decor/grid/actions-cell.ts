@@ -13,20 +13,8 @@ export type ActionsCellParams<T = unknown> = ICellRendererParams<T> & { actions:
 @Component({
   selector: 'hc-actions-cell',
   imports: [Button],
-  template: `
-    @for (action of actions(); track action.label) {
-      <button hc-button variant="ghost" type="button" (click)="action.run(row()!)">
-        {{ action.label }}
-      </button>
-    }
-  `,
-  styles: `
-    :host {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--hc-space-1);
-    }
-  `,
+  templateUrl: './actions-cell.html',
+  styleUrl: './actions-cell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActionsCell implements ICellRendererAngularComp {

@@ -15,9 +15,9 @@ import { Field } from '../decor/field/field';
 import { DAY_LABELS, levelLabel, timeRange } from '../decor/labels';
 import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
-import { Coach } from '../model/coach';
-import { DayOfWeek, WeeklySlot, WeeklySlotRequest } from '../model/weekly-slot';
-import { calendarHours, dayColumns } from './calendar-layout';
+import { Coach } from '../coaches/coachModel';
+import { DayOfWeek, WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
+import { calendarHours, dayColumns } from './calendar-layout/calendar-layout';
 import { WeeklySlotsService } from './weekly-slots-service';
 
 const SAVE_ERRORS: Record<number, string> = {

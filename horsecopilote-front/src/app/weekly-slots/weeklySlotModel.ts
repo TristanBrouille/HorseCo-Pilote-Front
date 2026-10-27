@@ -1,4 +1,4 @@
-import { Coach } from './coach';
+import { Coach } from '../coaches/coachModel';
 
 export type DayOfWeek =
   'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';

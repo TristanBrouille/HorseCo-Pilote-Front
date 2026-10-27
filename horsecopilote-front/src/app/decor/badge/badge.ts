@@ -4,7 +4,7 @@ export type BadgeTone = 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 
 
 @Component({
   selector: 'hc-badge',
-  template: '<ng-content />',
+  templateUrl: './badge.html',
   styleUrl: './badge.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class]': "'tone-' + tone()" },

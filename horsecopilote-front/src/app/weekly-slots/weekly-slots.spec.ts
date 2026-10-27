@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { WeeklySlot } from '../model/weekly-slot';
+import { WeeklySlot } from './weeklySlotModel';
 import { WeeklySlots } from './weekly-slots';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'http://localhost:8080';
 
 const SLOT: WeeklySlot = {
   id: 1,
