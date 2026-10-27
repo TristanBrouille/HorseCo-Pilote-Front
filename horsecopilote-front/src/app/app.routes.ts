@@ -14,6 +14,11 @@ export const routes: Routes = [
     canActivate: [authGuard], // On applique le Guard ici
   },
   {
+    path: 'admin/creneaux',
+    loadComponent: () => import('./weekly-slots/weekly-slots').then((m) => m.WeeklySlots),
+    canActivate: [authGuard],
+  },
+  {
     path: '**',
     redirectTo: '', // Redirige vers la racine (qui elle-même passera par le Guard)
   },
