@@ -1,0 +1,104 @@
+<main class="page">
+  <hc-page-header
+    title="Chevaux"
+    subtitle="La cavalerie du centre : statut, lieu actuel et limites de travail de chaque cheval."
+  >
+    <button hc-button actions type="button" (click)="openCreate()">Ajouter un cheval</button>
+  </hc-page-header>
+
+  @if (loadError()) {
+    <p class="error-banner" role="alert">{{ loadError() }}</p>
+  }
+
+  <ag-grid-angular
+    class="grid"
+    [theme]="theme"
+    [rowData]="horses()"
+    [columnDefs]="columns"
+    [localeText]="localeText"
+    domLayout="autoHeight"
+  />
+</main>
+
+<hc-modal
+  [title]="editedHorse() ? 'Modifier le cheval' : 'Ajouter un cheval'"
+  [width]="600"
+  [(open)]="formOpen"
+>
+  <form id="horse-form" class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <hc-field label="Nom" [error]="fieldError('name')">
+      <input type="text" maxlength="100" formControlName="name" />
+    </hc-field>
+    <hc-field label="Race" [error]="fieldError('breed')">
+      <input type="text" maxlength="100" formControlName="breed" />
+    </hc-field>
+    <hc-field
+      label="Statut"
+      hint="Seul un cheval disponible peut être attribué"
+      [error]="fieldError('status')"
+    >
+      <select formControlName="status">
+        @for (status of statuses; track status) {
+          <option [ngValue]="status">{{ statusLabels[status].label }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Lieu" [error]="fieldError('location')">
+      <select formControlName="location">
+        @for (location of locations; track location) {
+          <option [ngValue]="location">{{ locationLabels[location] }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Taille (cm)" [error]="fieldError('heightCm')">
+      <input type="number" min="80" max="220" formControlName="heightCm" />
+    </hc-field>
+    <hc-field label="Poids (kg)" [error]="fieldError('weightKg')">
+      <input type="number" min="100" max="1200" formControlName="weightKg" />
+    </hc-field>
+    <hc-field
+      label="Heures de travail par jour"
+      hint="3 au maximum"
+      [error]="fieldError('dailyHours')"
+    >
+      <input type="number" min="1" max="3" formControlName="dailyHours" />
+    </hc-field>
+    <hc-field label="Niveau requis (galop)" [error]="fieldError('requiredLevel')">
+      <input type="number" min="1" max="7" formControlName="requiredLevel" />
+    </hc-field>
+  </form>
+  @if (actionError()) {
+    <p class="error-banner" role="alert">{{ actionError() }}</p>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="formOpen.set(false)">
+    Annuler
+  </button>
+  <button hc-button actions type="submit" form="horse-form" [disabled]="saving()">
+    {{ editedHorse() ? 'Enregistrer' : 'Ajouter le cheval' }}
+  </button>
+</hc-modal>
+
+<hc-modal title="Supprimer le cheval" [(open)]="deleteOpen">
+  @if (horseToDelete(); as horse) {
+    <p class="hc-body">
+      {{ horse.name }} sera retiré de la cavalerie. Un cheval déjà attribué à des leçons ne peut pas
+      être supprimé : passez plutôt son statut à Repos ou Convalescence.
+    </p>
+  }
+  @if (actionError()) {
+    <p class="error-banner" role="alert">{{ actionError() }}</p>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="deleteOpen.set(false)">
+    Annuler
+  </button>
+  <button
+    hc-button
+    actions
+    variant="danger"
+    type="button"
+    [disabled]="saving()"
+    (click)="confirmDelete()"
+  >
+    Supprimer
+  </button>
+</hc-modal>

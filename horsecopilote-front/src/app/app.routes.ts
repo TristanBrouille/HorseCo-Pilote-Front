@@ -19,6 +19,11 @@ export const routes: Routes = [
     canActivate: [adminGuard],
   },
   {
+    path: 'admin/chevaux',
+    loadComponent: () => import('./horses/horses').then((m) => m.Horses),
+    canActivate: [adminGuard],
+  },
+  {
     path: '**',
     redirectTo: '', // Redirige vers la racine (qui elle-même passera par le Guard)
   },
