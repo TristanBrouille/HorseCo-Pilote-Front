@@ -15,3 +15,16 @@ export const authGuard: CanActivateFn = async () => {
     return false;
   }
 };
+
+// UI only: the back refuses non-admin writes anyway.
+export const adminGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  const authService = inject(AuthService);
+
+  try {
+    const me = await authService.getMe();
+    return me.role === 'ADMIN' ? true : router.createUrlTree(['/']);
+  } catch {
+    return router.createUrlTree(['/login']);
+  }
+};

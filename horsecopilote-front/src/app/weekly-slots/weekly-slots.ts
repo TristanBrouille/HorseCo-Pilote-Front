@@ -22,6 +22,7 @@ import { WeeklySlotsService } from './weekly-slots-service';
 
 const SAVE_ERRORS: Record<number, string> = {
   400: 'Certaines valeurs sont invalides.',
+  403: 'Seul un administrateur peut modifier les créneaux.',
   404: "Ce coach ou ce créneau n'existe plus. Rechargez la page.",
   409: 'Ce coach a déjà un créneau qui chevauche cet horaire.',
 };
