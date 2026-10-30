@@ -5,6 +5,9 @@
 
 .hc-cell-strong {
   font: var(--hc-text-body-strong);
+  // the token's 20px line-height overrides AG Grid's row line-height: re-centre vertically
+  display: flex;
+  align-items: center;
 }
 
 .hc-header-hidden .ag-header-cell-text {
