@@ -1,0 +1,5 @@
+@for (action of actions(); track action.label) {
+  <button hc-button variant="ghost" type="button" (click)="action.run(row()!)">
+    {{ action.label }}
+  </button>
+}

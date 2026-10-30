@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Login } from './login/login';
 import { Dashboard } from './dashboard/dashboard';
-import { authGuard } from './auth/guard';
+import { adminGuard, authGuard } from './auth/guard';
 
 export const routes: Routes = [
   {
@@ -12,6 +12,11 @@ export const routes: Routes = [
     path: '',
     component: Dashboard, // La page où l'utilisateur arrive s'il est connecté
     canActivate: [authGuard], // On applique le Guard ici
+  },
+  {
+    path: 'admin/creneaux',
+    loadComponent: () => import('./weekly-slots/weekly-slots').then((m) => m.WeeklySlots),
+    canActivate: [adminGuard],
   },
   {
     path: '**',

@@ -1,59 +1,49 @@
-# HorsecopiloteFront
+# HorseCo-Pilote — Front (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.1.
+Application Angular du CRM de gestion du centre équestre. Elle consomme l'API REST du dépôt [HorseCo-Pilote](https://github.com/TristanBrouille/HorseCo-Pilote) (back Spring Boot).
 
-## Development server
+## Prérequis
 
-To start a local development server, run:
+- **Node.js** `^22.22.3`, `^24.15.0` ou `>=26` — `node -v`
+- **npm 11** (fourni avec Node 24) — `npm -v`
+- Le **back lancé** sur `http://localhost:8080` (voir son README : `docker compose up -d` puis `./mvnw spring-boot:run`)
 
-```bash
-ng serve
-```
+## Lancer le projet
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Toutes les commandes se lancent depuis ce dossier (`horsecopilote-front/`).
 
 ```bash
-ng generate component component-name
+# 1. Installer les dépendances (Angular, AG Grid…) — à refaire après chaque pull qui modifie package.json
+npm install
+
+# 2. Lancer le serveur de développement (http://localhost:4200, rechargement automatique)
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Ouvrir ensuite `http://localhost:4200`. L'URL de l'API est définie dans `src/app/core/api.ts` (`http://localhost:8080/api`).
+
+## Ordre de démarrage complet (back + front)
 
 ```bash
-ng generate --help
+# Dans horsecopilote/ (back)
+docker compose up -d
+./mvnw spring-boot:run          # Windows : .\mvnw.cmd spring-boot:run
+
+# Dans horsecopilote-front/ (front), dans un autre terminal
+npm install
+npm start
 ```
 
-## Building
-
-To build the project run:
+## Tests et build
 
 ```bash
-ng build
+npm test          # tests unitaires (Vitest)
+npm run build     # build de production dans dist/
+npm run watch     # build de développement en continu
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Problèmes fréquents
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Erreurs réseau / CORS dans la console** : le back n'est pas lancé, ou le front ne tourne pas sur le port 4200 (seule origine autorisée par le back).
+- **Port 4200 déjà utilisé** : `npm start -- --port 4300` (il faudra alors ajouter cette origine dans `app.cors.allowed-origins` côté back).
+- **Module introuvable après un pull** : relancer `npm install`.

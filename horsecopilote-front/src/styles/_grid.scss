@@ -1,0 +1,17 @@
+// AG Grid renders its cells outside component styles: shared cell classes live here.
+.ag-header-cell-text {
+  text-transform: uppercase;
+}
+
+.hc-cell-strong {
+  font: var(--hc-text-body-strong);
+}
+
+.hc-header-hidden .ag-header-cell-text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

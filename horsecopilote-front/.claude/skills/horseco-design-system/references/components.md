@@ -1,6 +1,6 @@
 # Composants partagés — spécification
 
-Emplacement : `src/app/shared/ui/<nom>/`. Composants **standalone**, entrées en `input()` / `input.required()`, sorties en `output()`, `ChangeDetectionStrategy.OnPush`. Sélecteur préfixé `hc-`. Styles uniquement à base de tokens (`var(--hc-…)`).
+Emplacement : `src/app/decor/<nom>/` (voir `architecture.md`). Composants **standalone**, entrées en `input()` / `input.required()`, sorties en `output()`, `ChangeDetectionStrategy.OnPush`. Sélecteur préfixé `hc-`. Styles uniquement à base de tokens (`var(--hc-…)`).
 
 ---
 
@@ -88,12 +88,19 @@ Entrée `tone: 'info' | 'warning' | 'late' | 'subtle'`.
 - Rayon `--hc-radius-md`, padding `12px 16px`, gap 12 px, texte `body`.
 - info : fond `status-info-soft`, texte `status-info` · warning : `status-warning-soft` / `status-warning` · late : fond `highlight-late-soft`, bordure 1 px `highlight-late`, texte `status-warning`, pastille ronde 10 px `highlight-late` · subtle : fond `bg-subtle`, texte muted.
 
-## Tableau — pattern `hc-table`
+## Tableau — AG Grid (`ag-grid-angular`)
 
-- Conteneur : `hc-card` flush, `overflow: hidden`.
+Tous les tableaux de données utilisent **AG Grid** (`ag-grid-community` + `ag-grid-angular`), jamais un `<table>` HTML fait main. Le style HorseCo est appliqué via la Theming API d'AG Grid, à partir des tokens.
+
+- Thème partagé dans `src/app/decor/grid/hc-grid-theme.ts` (qui enregistre aussi les modules AG Grid utilisés) : `themeQuartz.withParams({...})` dont les valeurs pointent sur les tokens (`var(--hc-…)`), passé en `[theme]` à chaque `<ag-grid-angular>`. Aucune couleur codée en dur.
+- Conteneur : `hc-card` flush, `overflow: hidden`, rayon `--hc-radius-lg` (`wrapperBorderRadius`).
 - En-tête : fond `--hc-bg-subtle`, padding `10px 20px`, libellés `caption` muted en MAJUSCULES.
-- Lignes : padding `13px 20px`, bordure haute 1 px `--hc-border-default`, gap entre colonnes 16 px ; 1re colonne en `body-strong`, autres en `body`.
-- Ligne passée / annulée : textes en `--hc-text-disabled` (les badges gardent leur couleur).
+- Lignes : padding horizontal 20 px, bordure 1 px `--hc-border-default` entre les lignes, pas de bordures verticales ; 1re colonne en `body-strong` (`cellClass`), autres en `body`. Police DM Sans (`fontFamily`).
+- Ligne passée / annulée : `rowClassRules` → textes en `--hc-text-disabled` (les badges gardent leur couleur).
+- Badges, boutons et actions dans les cellules : `cellRenderer` réutilisant les composants `hc-*` — génériques dans `src/app/decor/grid/` : `BadgeCell` (`cellRendererParams: { tone }`) et `ActionsCell` (`cellRendererParams: { actions: [{ label, run }] }`).
+- Classes de cellule globales (AG Grid rend hors des styles de composant) dans `src/styles/_grid.scss` : `hc-cell-strong` (1re colonne), `hc-header-hidden` (en-tête masqué visuellement, ex. colonne Actions).
+- États métier (grisé, surbrillance) : `rowClassRules` sur les champs renvoyés par l'API (`selectable`, `hasPendingMembers`…), sans recalcul côté front.
+- Libellés de la grille en français (`localeText`) ; `domLayout: 'autoHeight'` pour les listes courtes.
 
 ## Modale — `hc-modal`
 
