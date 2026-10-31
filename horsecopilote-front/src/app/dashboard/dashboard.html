@@ -1,1 +1,30 @@
-<p>dashboard works!</p>
+<main class="page">
+  <hc-page-header [title]="title()" [subtitle]="subtitle()" />
+
+  <section aria-labelledby="features-title">
+    <h2 id="features-title" class="hc-title-2">Vos fonctionnalités</h2>
+
+    <ul class="features">
+      @for (feature of features(); track feature.label) {
+        <li>
+          @if (feature.route) {
+            <a class="feature-card" [routerLink]="feature.route">
+              <span class="hc-title-2">{{ feature.label }}</span>
+              <span class="hc-body hc-muted">{{ feature.description }}</span>
+              <span class="open hc-body-strong" aria-hidden="true">Ouvrir →</span>
+            </a>
+          } @else {
+            <div class="feature-card disabled" aria-disabled="true">
+              <span class="card-top">
+                <span class="hc-title-2">{{ feature.label }}</span>
+                <hc-badge tone="neutral">Bientôt disponible</hc-badge>
+              </span>
+              <span class="hc-body">{{ feature.description }}</span>
+              <span class="reason hc-caption">Fonctionnalité pas encore développée</span>
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  </section>
+</main>

@@ -1,0 +1,36 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hc-space-4);
+  padding: var(--hc-space-3) var(--hc-space-10);
+  border-bottom: 1px solid var(--hc-border-default);
+  background: var(--hc-bg-surface);
+}
+
+.date {
+  margin: 0;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: var(--hc-space-3);
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--hc-avatar-size);
+  height: var(--hc-avatar-size);
+  border-radius: var(--hc-radius-pill);
+  background: var(--hc-brand-primary-soft);
+  color: var(--hc-brand-primary);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+}

@@ -85,6 +85,10 @@
 
   // ---------- Layout ----------
   --hc-sidebar-width: 240px;
+  --hc-logo-size: 36px; // monogramme « H » de la sidebar
+  --hc-avatar-size: 32px; // pastille d'initiales de l'utilisateur
+  --hc-nav-item-height: 40px;
+  --hc-feature-card-min-width: 280px; // cartes du tableau de bord
   --hc-page-padding: 32px 40px;
   --hc-focus-ring: 2px solid var(--hc-highlight-late);
 }

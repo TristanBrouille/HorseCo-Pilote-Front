@@ -44,7 +44,7 @@ export class Login {
         const me = await this.authService.login(credentials);
 
         console.log('Utilisateur connecté :', me);
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/']);
       } catch (error) {
         console.error('Erreur de connexion', error);
         this.errorMessage = 'Identifiants incorrects ou problème de serveur.';

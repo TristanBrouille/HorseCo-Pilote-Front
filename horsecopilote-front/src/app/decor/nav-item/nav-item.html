@@ -1,0 +1,9 @@
+<a
+  [routerLink]="route()"
+  routerLinkActive="active"
+  [routerLinkActiveOptions]="{ exact: route() === '/' }"
+  ariaCurrentWhenActive="page"
+>
+  <span class="dot" aria-hidden="true"></span>
+  <span class="label">{{ label() }}</span>
+</a>

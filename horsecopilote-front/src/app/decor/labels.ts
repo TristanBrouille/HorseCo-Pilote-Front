@@ -1,3 +1,4 @@
+import { Role } from '../auth/authModel';
 import { LessonStatus, LessonType } from '../coach-lessons/coachLessonModel';
 import { HorseStatus, Location } from '../horses/horseModel';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
@@ -63,6 +64,12 @@ export const longDateLabel = (date: Date) =>
 // '12 octobre 2026'
 export const dayMonthYearLabel = (date: Date) =>
   new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+
+export const ROLE_LABELS: Record<Role, { label: string; tone: BadgeTone }> = {
+  MEMBRE: { label: 'Membre', tone: 'brand' },
+  COACH: { label: 'Coach', tone: 'info' },
+  ADMIN: { label: 'Admin', tone: 'danger' },
+};
 
 export const LOCATION_LABELS: Record<Location, string> = {
   CARRIERE: 'Carrière',

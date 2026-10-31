@@ -1,0 +1,20 @@
+<div class="brand">
+  <span class="logo hc-title-2" aria-hidden="true">H</span>
+  <div class="brand-text">
+    <span class="hc-title-2 name">HorseCo-Pilote</span>
+    <span class="hc-caption subtitle">Centre équestre</span>
+  </div>
+</div>
+
+<nav aria-label="Navigation principale">
+  <ul>
+    <li><hc-nav-item label="Tableau de bord" route="/" /></li>
+  </ul>
+
+  <p class="section hc-caption">{{ navigation().section }}</p>
+  <ul>
+    @for (item of items(); track item.route) {
+      <li><hc-nav-item [label]="item.label" [route]="item.route!" /></li>
+    }
+  </ul>
+</nav>
