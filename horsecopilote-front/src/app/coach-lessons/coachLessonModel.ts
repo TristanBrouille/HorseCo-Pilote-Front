@@ -18,8 +18,9 @@ export interface LessonParticipant {
   horse: AssignedHorse | null;
 }
 
-// A lesson of the week as seen by the connected coach (GET /lessons).
-// participants is null for the other coaches' lessons (R11).
+// A lesson of the week as seen by the connected coach or admin (GET /lessons).
+// editable: the coach of the lesson, or an admin (every lesson).
+// participants is null when the lesson is not editable (R11).
 export interface CoachLesson {
   id: number;
   weeklySlotId: number | null;
@@ -30,6 +31,7 @@ export interface CoachLesson {
   status: LessonStatus;
   coach: Coach;
   mine: boolean;
+  editable: boolean;
   hasPendingMembers: boolean;
   participantCount: number;
   participants: LessonParticipant[] | null;
@@ -38,6 +40,14 @@ export interface CoachLesson {
 // PATCH /lessons/{id}
 export interface LessonTopicRequest {
   topic: LessonType;
+}
+
+// PUT /lessons/{id} (admin): cancelling releases the horses (R9)
+export interface LessonUpdateRequest {
+  coachId: number;
+  location: Location;
+  topic: LessonType;
+  status: LessonStatus;
 }
 
 // PUT /lessons/{id}/participants/{memberId}/horse

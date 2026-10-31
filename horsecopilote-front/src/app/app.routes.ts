@@ -33,6 +33,12 @@ export const routes: Routes = [
         canActivate: [adminGuard],
       },
       {
+        path: 'admin/lecons',
+        loadComponent: () => import('./coach-lessons/coach-lessons').then((m) => m.CoachLessons),
+        canActivate: [adminGuard],
+        data: { admin: true },
+      },
+      {
         path: 'coach/cours',
         loadComponent: () => import('./coach-lessons/coach-lessons').then((m) => m.CoachLessons),
         canActivate: [coachGuard],

@@ -15,14 +15,25 @@ import { Callout } from '../../decor/callout/callout';
 import { Field } from '../../decor/field/field';
 import { HorseOption as HorseOptionRow } from '../../decor/horse-option/horse-option';
 import {
+  LESSON_STATUSES,
   LESSON_STATUS_LABELS,
   LESSON_TYPES,
   LESSON_TYPE_LABELS,
+  LOCATIONS,
+  LOCATION_LABELS,
   horseUnavailabilityLabel,
   levelLabel,
   workloadLabel,
 } from '../../decor/labels';
-import { CoachLesson, HorseOption, LessonParticipant, LessonType } from '../coachLessonModel';
+import { Coach } from '../../coaches/coachModel';
+import { Location } from '../../horses/horseModel';
+import {
+  CoachLesson,
+  HorseOption,
+  LessonParticipant,
+  LessonStatus,
+  LessonType,
+} from '../coachLessonModel';
 import { CoachLessonsService } from '../coach-lessons-service';
 
 const COMMON_ERRORS: Record<number, string> = {
@@ -32,6 +43,7 @@ const COMMON_ERRORS: Record<number, string> = {
 };
 
 const TOPIC_CONFLICT = "La leçon n'est plus prévue : son sujet ne peut plus être modifié.";
+const LESSON_CONFLICT = 'Ce coach donne déjà une leçon à cet horaire.';
 const HORSE_CONFLICT =
   'Ce cheval ne peut plus être attribué (la leçon ou les plannings ont changé). La liste a été mise à jour.';
 
@@ -39,6 +51,7 @@ const fullName = (participant: LessonParticipant) =>
   `${participant.firstName} ${participant.lastName}`;
 
 // Lets the coach of a lesson change its topic and give a horse to each participant (R12, R20).
+// In admin mode, also the coach, location and status of the lesson (R21).
 // Every rule is checked by the back: this component only shows the flags it returns.
 @Component({
   selector: 'app-lesson-editor',
@@ -51,10 +64,16 @@ export class LessonEditor {
   private readonly coachLessonsService = inject(CoachLessonsService);
 
   readonly lesson = input.required<CoachLesson>();
+  readonly admin = input(false);
+  readonly coaches = input<Coach[]>([]);
   readonly changed = output<CoachLesson>();
 
   protected readonly lessonTypes = LESSON_TYPES;
   protected readonly typeLabels = LESSON_TYPE_LABELS;
+  protected readonly locations = LOCATIONS;
+  protected readonly locationLabels = LOCATION_LABELS;
+  protected readonly statuses = LESSON_STATUSES;
+  protected readonly statusLabels = LESSON_STATUS_LABELS;
   protected readonly levelLabel = levelLabel;
   protected readonly fullName = fullName;
 
@@ -87,7 +106,22 @@ export class LessonEditor {
   protected readonly chosenHorseId = signal<number | null>(null);
   protected readonly savingHorse = signal(false);
 
+  // admin form, reset whenever another (or an updated) lesson is shown
+  protected readonly coachId = linkedSignal(() => this.lesson().coach.id);
+  protected readonly location = linkedSignal(() => this.lesson().location);
+  protected readonly status = linkedSignal(() => this.lesson().status);
+  protected readonly savingLesson = signal(false);
+
   protected readonly topicChanged = computed(() => this.topic() !== this.lesson().topic);
+  protected readonly lessonChanged = computed(() => {
+    const lesson = this.lesson();
+    return (
+      this.topicChanged() ||
+      this.coachId() !== lesson.coach.id ||
+      this.location() !== lesson.location ||
+      this.status() !== lesson.status
+    );
+  });
   protected readonly unassignedCount = computed(
     () => this.participants().filter((participant) => !participant.horse).length,
   );
@@ -109,6 +143,41 @@ export class LessonEditor {
       this.error.set(this.errorMessage(error, TOPIC_CONFLICT));
     } finally {
       this.savingTopic.set(false);
+    }
+  }
+
+  protected onCoachChange(event: Event) {
+    this.coachId.set(Number((event.target as HTMLSelectElement).value));
+  }
+
+  protected onLocationChange(event: Event) {
+    this.location.set((event.target as HTMLSelectElement).value as Location);
+  }
+
+  protected onStatusChange(event: Event) {
+    this.status.set((event.target as HTMLSelectElement).value as LessonStatus);
+  }
+
+  protected async saveLesson(): Promise<void> {
+    this.savingLesson.set(true);
+    this.clearMessages();
+    try {
+      const lesson = await this.coachLessonsService.updateLesson(this.lesson().id, {
+        coachId: this.coachId(),
+        location: this.location(),
+        topic: this.topic(),
+        status: this.status(),
+      });
+      this.notice.set(
+        lesson.status === 'ANNULEE'
+          ? 'Leçon annulée : ses chevaux sont libérés.'
+          : 'Leçon modifiée.',
+      );
+      this.changed.emit(lesson);
+    } catch (error) {
+      this.error.set(this.errorMessage(error, LESSON_CONFLICT));
+    } finally {
+      this.savingLesson.set(false);
     }
   }
 

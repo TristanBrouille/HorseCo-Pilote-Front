@@ -25,6 +25,8 @@ import { LessonBlock, LessonBlockData, LessonBlockState } from '../decor/lesson-
 import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
+import { Coach } from '../coaches/coachModel';
+import { CoachesService } from '../coaches/coaches-service';
 import { CoachLesson } from './coachLessonModel';
 import { CoachLessonsService } from './coach-lessons-service';
 import { LessonEditor } from './lesson-editor/lesson-editor';
@@ -42,7 +44,7 @@ const WORKING_DAYS = ALL_DAYS.filter((day) => day !== 'SUNDAY');
 
 const LOAD_ERRORS: Record<number, string> = {
   401: 'Votre session a expiré. Reconnectez-vous.',
-  403: 'Cet agenda est réservé aux coachs.',
+  403: 'Cet agenda est réservé aux coachs et aux administrateurs.',
 };
 
 const participantsLabel = (count: number) =>
@@ -54,7 +56,7 @@ const stateOf = (lesson: CoachLesson): LessonBlockState => {
   if (lesson.status === 'ANNULEE') {
     return 'cancelled';
   }
-  if (!lesson.mine) {
+  if (!lesson.editable) {
     return 'other';
   }
   return lesson.hasPendingMembers ? 'late' : 'normal';
@@ -69,9 +71,14 @@ const stateOf = (lesson: CoachLesson): LessonBlockState => {
 })
 export class CoachLessons implements OnInit {
   private readonly coachLessonsService = inject(CoachLessonsService);
+  private readonly coachesService = inject(CoachesService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private loadRequest = 0;
+
+  // Same calendar for the admin (route data): every lesson is editable, coach included (R21).
+  protected readonly admin = this.route.snapshot.data['admin'] === true;
+  protected readonly coaches = signal<Coach[]>([]);
 
   protected readonly dayLabels = DAY_LABELS;
   protected readonly typeLabels = LESSON_TYPE_LABELS;
@@ -101,7 +108,11 @@ export class CoachLessons implements OnInit {
         time: timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime)),
         topic: LESSON_TYPE_LABELS[lesson.topic],
         location: LOCATION_LABELS[lesson.location],
-        details: lesson.mine ? participantsLabel(lesson.participantCount) : coachName(lesson),
+        details: this.admin
+          ? `${coachName(lesson)} · ${participantsLabel(lesson.participantCount)}`
+          : lesson.editable
+            ? participantsLabel(lesson.participantCount)
+            : coachName(lesson),
       },
     })),
   );
@@ -129,7 +140,7 @@ export class CoachLessons implements OnInit {
     if (requested) {
       this.weekStart.set(mondayOf(requested));
     }
-    await this.loadWeek();
+    await Promise.all([this.loadWeek(), this.admin ? this.loadCoaches() : null]);
   }
 
   protected openDetails(lesson: CoachLesson) {
@@ -167,6 +178,14 @@ export class CoachLessons implements OnInit {
       replaceUrl: true,
     });
     await this.loadWeek();
+  }
+
+  private async loadCoaches(): Promise<void> {
+    try {
+      this.coaches.set(await this.coachesService.getAll());
+    } catch {
+      this.loadError.set('Impossible de charger la liste des coachs.');
+    }
   }
 
   private async loadWeek(): Promise<void> {

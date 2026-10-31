@@ -16,6 +16,25 @@
   font: var(--hc-text-body);
 }
 
+.success-banner {
+  margin: 0;
+  padding: var(--hc-space-3) var(--hc-space-4);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-status-success-soft);
+  color: var(--hc-status-success);
+  font: var(--hc-text-body);
+
+  &:empty {
+    display: none;
+  }
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hc-space-3);
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

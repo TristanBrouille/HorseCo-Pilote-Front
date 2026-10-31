@@ -83,6 +83,10 @@ export const LOCATION_LABELS: Record<Location, string> = {
 
 export const LESSON_TYPES = Object.keys(LESSON_TYPE_LABELS) as LessonType[];
 
+export const LOCATIONS = Object.keys(LOCATION_LABELS) as Location[];
+
+export const LESSON_STATUSES = Object.keys(LESSON_STATUS_LABELS) as LessonStatus[];
+
 // '1/3 h'
 export const workloadLabel = (hours: number, dailyHours: number) => `${hours}/${dailyHours} h`;
 

@@ -3,7 +3,57 @@
 }
 <p class="message notice hc-body" role="status">{{ notice() }}</p>
 
-@if (editable()) {
+@if (admin()) {
+  <div class="lesson-form">
+    <hc-field label="Coach">
+      <select [disabled]="savingLesson()" (change)="onCoachChange($event)">
+        @for (coach of coaches(); track coach.id) {
+          <option [value]="coach.id" [selected]="coach.id === coachId()">
+            {{ coach.firstName }} {{ coach.lastName }}
+          </option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Sujet de la leçon">
+      <select [disabled]="savingLesson()" (change)="onTopicChange($event)">
+        @for (type of lessonTypes; track type) {
+          <option [value]="type" [selected]="type === topic()">{{ typeLabels[type] }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Lieu">
+      <select [disabled]="savingLesson()" (change)="onLocationChange($event)">
+        @for (place of locations; track place) {
+          <option [value]="place" [selected]="place === location()">
+            {{ locationLabels[place] }}
+          </option>
+        }
+      </select>
+    </hc-field>
+    <hc-field
+      label="Statut"
+      [hint]="status() === 'ANNULEE' ? 'Annuler la leçon libère ses chevaux.' : null"
+    >
+      <select [disabled]="savingLesson()" (change)="onStatusChange($event)">
+        @for (value of statuses; track value) {
+          <option [value]="value" [selected]="value === status()">
+            {{ statusLabels[value].label }}
+          </option>
+        }
+      </select>
+    </hc-field>
+    <div class="lesson-form-actions">
+      <button
+        hc-button
+        type="button"
+        [disabled]="!lessonChanged() || savingLesson()"
+        (click)="saveLesson()"
+      >
+        Enregistrer la leçon
+      </button>
+    </div>
+  </div>
+} @else if (editable()) {
   <div class="topic">
     <hc-field label="Sujet de la leçon">
       <select [disabled]="savingTopic()" (change)="onTopicChange($event)">

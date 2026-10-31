@@ -12,13 +12,38 @@ import { CoachesService } from '../coaches/coaches-service';
 import { Badge } from '../decor/badge/badge';
 import { Button } from '../decor/button/button';
 import { Field } from '../decor/field/field';
-import { DAY_LABELS, levelLabel, timeRange } from '../decor/labels';
+import {
+  DAY_LABELS,
+  LESSON_TYPES,
+  LESSON_TYPE_LABELS,
+  LOCATIONS,
+  LOCATION_LABELS,
+  dayMonthYearLabel,
+  levelLabel,
+  timeRange,
+} from '../decor/labels';
 import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { Coach } from '../coaches/coachModel';
-import { DayOfWeek, SlotMember, WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
+import { addDays, parseIsoDate, toIsoDate } from '../coach-lessons/week/week';
+import {
+  DayOfWeek,
+  LessonGenerationRequest,
+  LessonGenerationResult,
+  SlotMember,
+  WeeklySlot,
+  WeeklySlotRequest,
+} from './weeklySlotModel';
 import { calendarHours, dayColumns } from '../decor/calendar-layout/calendar-layout';
 import { WeeklySlotsService } from './weekly-slots-service';
+
+const GENERATION_ERRORS: Record<number, string> = {
+  400: 'Choisissez une date de fin, un sujet et un lieu.',
+  403: 'Seul un administrateur peut générer les leçons.',
+  409: "La date de fin doit être comprise entre aujourd'hui et dans un an.",
+};
+
+const lessonsLabel = (count: number) => `${count} leçon${count > 1 ? 's' : ''}`;
 
 const SAVE_ERRORS: Record<number, string> = {
   400: 'Certaines valeurs sont invalides.',
@@ -75,6 +100,25 @@ export class WeeklySlots implements OnInit {
   protected readonly selectedMemberId = signal<number | null>(null);
   protected readonly memberError = signal<string | null>(null);
 
+  protected readonly lessonTypes = LESSON_TYPES;
+  protected readonly typeLabels = LESSON_TYPE_LABELS;
+  protected readonly locations = LOCATIONS;
+  protected readonly locationLabels = LOCATION_LABELS;
+  protected readonly today = toIsoDate(new Date());
+  protected readonly maxGenerationDate = toIsoDate(
+    new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()),
+  );
+
+  protected generationOpen = signal(false);
+  protected readonly generationError = signal<string | null>(null);
+  protected readonly generationResult = signal<string | null>(null);
+
+  protected readonly generationForm = this.fb.group({
+    untilDate: this.fb.control(toIsoDate(addDays(new Date(), 28)), Validators.required),
+    topic: this.fb.control<LessonGenerationRequest['topic']>('CSO', Validators.required),
+    location: this.fb.control<LessonGenerationRequest['location']>('CARRIERE', Validators.required),
+  });
+
   protected readonly form = this.fb.group({
     coachId: this.fb.control<number | null>(null, Validators.required),
     dayOfWeek: this.fb.control<DayOfWeek>('MONDAY', Validators.required),
@@ -95,6 +139,49 @@ export class WeeklySlots implements OnInit {
     }
     this.actionError.set(null);
     this.formOpen.set(true);
+  }
+
+  protected openGeneration() {
+    this.generationError.set(null);
+    this.generationOpen.set(true);
+  }
+
+  // The API creates the missing lessons of every slot; the rules (dates, coach overlaps) stay in the back.
+  protected async generateLessons(): Promise<void> {
+    if (this.generationForm.invalid) {
+      this.generationForm.markAllAsTouched();
+      return;
+    }
+    this.saving.set(true);
+    this.generationError.set(null);
+    try {
+      const result = await this.weeklySlotsService.generateLessons(
+        this.generationForm.getRawValue(),
+      );
+      this.generationResult.set(this.generationSummary(result));
+      this.generationOpen.set(false);
+    } catch (error) {
+      const status = (error as HttpErrorResponse).status;
+      this.generationError.set(
+        GENERATION_ERRORS[status] ?? 'La génération a échoué. Vérifiez que le serveur est démarré.',
+      );
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  private generationSummary(result: LessonGenerationResult): string {
+    const until = dayMonthYearLabel(parseIsoDate(result.untilDate)!);
+    const bookings = `${result.bookingCount} participant${result.bookingCount > 1 ? 's' : ''}`;
+    const created = result.createdCount
+      ? `${lessonsLabel(result.createdCount)} créée${result.createdCount > 1 ? 's' : ''} jusqu'au ${until}, ` +
+        `avec ${bookings} inscrit${result.bookingCount > 1 ? 's' : ''} d'office.`
+      : `Aucune nouvelle leçon jusqu'au ${until}.`;
+    const skipped = result.skippedCount
+      ? ` ${lessonsLabel(result.skippedCount)} ignorée${result.skippedCount > 1 ? 's' : ''} ` +
+        '(déjà existante ou coach indisponible).'
+      : '';
+    return created + skipped;
   }
 
   protected openEdit(slot: WeeklySlot) {

@@ -6,6 +6,7 @@ import {
   HorseAssignmentRequest,
   HorseOption,
   LessonTopicRequest,
+  LessonUpdateRequest,
 } from './coachLessonModel';
 
 @Injectable({ providedIn: 'root' })
@@ -19,9 +20,14 @@ export class CoachLessonsService {
     return firstValueFrom(this.http.get<CoachLesson[]>(this.baseUrl, { params: { weekStart } }));
   }
 
-  // Only the coach of the lesson may change it (the API answers 403 otherwise).
+  // Only the coach of the lesson or an admin may change it (the API answers 403 otherwise).
   updateTopic(lessonId: number, request: LessonTopicRequest): Promise<CoachLesson> {
     return firstValueFrom(this.http.patch<CoachLesson>(`${this.baseUrl}/${lessonId}`, request));
+  }
+
+  // Admin only: coach, location, topic and status of any lesson.
+  updateLesson(lessonId: number, request: LessonUpdateRequest): Promise<CoachLesson> {
+    return firstValueFrom(this.http.put<CoachLesson>(`${this.baseUrl}/${lessonId}`, request));
   }
 
   // Every horse of the centre, flagged selectable or not (with the reason) for this participant.

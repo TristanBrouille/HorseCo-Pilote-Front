@@ -3,12 +3,19 @@
     title="Créneaux hebdomadaires"
     subtitle="Le planning des cours d'1 heure, répété chaque semaine. Les membres s'inscrivent à un créneau pour un an."
   >
-    <button hc-button actions type="button" (click)="openCreate()">Ajouter un créneau</button>
+    <div actions class="header-actions">
+      <button hc-button variant="secondary" type="button" (click)="openGeneration()">
+        Générer les leçons
+      </button>
+      <button hc-button type="button" (click)="openCreate()">Ajouter un créneau</button>
+    </div>
   </hc-page-header>
 
   @if (loadError()) {
     <p class="error-banner" role="alert">{{ loadError() }}</p>
   }
+
+  <p class="success-banner" role="status">{{ generationResult() }}</p>
 
   @if (!slots().length && !loadError()) {
     <p class="hc-body hc-muted">
@@ -206,6 +213,57 @@
   </button>
   <button hc-button actions type="submit" form="slot-form" [disabled]="saving()">
     {{ editedSlot() ? 'Enregistrer' : 'Ajouter le créneau' }}
+  </button>
+</hc-modal>
+
+<hc-modal title="Générer les leçons" [width]="600" [(open)]="generationOpen">
+  <p class="hc-body">
+    Crée une leçon par créneau et par semaine, d'aujourd'hui jusqu'à la date choisie. Les leçons
+    déjà créées ne sont pas modifiées. Les membres inscrits au créneau sont ajoutés directement à
+    chaque leçon : il ne reste qu'à leur attribuer un cheval.
+  </p>
+  <form
+    id="generation-form"
+    class="form-grid"
+    [formGroup]="generationForm"
+    (ngSubmit)="generateLessons()"
+    novalidate
+  >
+    <hc-field
+      class="full"
+      label="Jusqu'au"
+      hint="Un an au maximum"
+      [error]="
+        generationForm.controls.untilDate.touched && generationForm.controls.untilDate.invalid
+          ? 'Champ obligatoire.'
+          : null
+      "
+    >
+      <input type="date" formControlName="untilDate" [min]="today" [max]="maxGenerationDate" />
+    </hc-field>
+    <hc-field label="Sujet par défaut">
+      <select formControlName="topic">
+        @for (type of lessonTypes; track type) {
+          <option [ngValue]="type">{{ typeLabels[type] }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Lieu par défaut">
+      <select formControlName="location">
+        @for (location of locations; track location) {
+          <option [ngValue]="location">{{ locationLabels[location] }}</option>
+        }
+      </select>
+    </hc-field>
+  </form>
+  @if (generationError()) {
+    <p class="error-banner" role="alert">{{ generationError() }}</p>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="generationOpen.set(false)">
+    Annuler
+  </button>
+  <button hc-button actions type="submit" form="generation-form" [disabled]="saving()">
+    Générer
   </button>
 </hc-modal>
 
