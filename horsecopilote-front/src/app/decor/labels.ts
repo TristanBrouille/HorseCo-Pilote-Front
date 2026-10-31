@@ -1,5 +1,5 @@
 import { Role } from '../auth/authModel';
-import { LessonStatus, LessonType } from '../coach-lessons/coachLessonModel';
+import { HorseOption, LessonStatus, LessonType } from '../coach-lessons/coachLessonModel';
 import { HorseStatus, Location } from '../horses/horseModel';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
 import { BadgeTone } from './badge/badge';
@@ -77,4 +77,29 @@ export const LOCATION_LABELS: Record<Location, string> = {
   MANEGE: 'Manège',
   BOX: 'Box',
   PADOCK: 'Padock',
+};
+
+export const LESSON_TYPES = Object.keys(LESSON_TYPE_LABELS) as LessonType[];
+
+// '1/3 h'
+export const workloadLabel = (hours: number, dailyHours: number) => `${hours}/${dailyHours} h`;
+
+// Reason sent by the API (R14 to R19), worded for the coach; null when the horse is selectable.
+export const horseUnavailabilityLabel = (option: HorseOption): string | null => {
+  switch (option.reason) {
+    case 'STATUS':
+      return `Statut : ${HORSE_STATUS_LABELS[option.status].label}`;
+    case 'LEVEL':
+      return `Niveau requis : ${levelLabel(option.requiredLevel)}`;
+    case 'WEIGHT':
+      return 'Poids cavalier > 20 %';
+    case 'ALREADY_ASSIGNED':
+      return 'Déjà attribué sur ce créneau';
+    case 'DAILY_HOURS':
+      return `${workloadLabel(option.hoursToday, option.dailyHours)} aujourd'hui`;
+    case 'CONSECUTIVE_HOURS':
+      return '2 h consécutives : pause nécessaire';
+    default:
+      return null;
+  }
 };

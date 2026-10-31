@@ -36,14 +36,15 @@ export const NAVIGATION_BY_ROLE: Record<Role, RoleNavigation> = {
     features: [
       {
         label: 'Agenda de la semaine',
-        description: 'Vos leçons de la semaine, leurs participants et les chevaux attribués.',
+        description:
+          'Les leçons du centre dans un calendrier : ouvrez les vôtres pour les préparer.',
         route: '/coach/cours',
       },
       {
-        label: 'Attribution des chevaux',
+        label: 'Préparation des cours',
         description:
-          'Attribuez à chaque cavalier un cheval compatible avec son niveau et son poids.',
-        route: null,
+          'Choisissez le sujet de vos leçons et attribuez à chaque cavalier un cheval compatible.',
+        route: '/coach/preparation',
       },
     ],
   },

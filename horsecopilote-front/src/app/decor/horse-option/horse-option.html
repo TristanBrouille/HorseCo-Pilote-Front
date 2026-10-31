@@ -1,0 +1,21 @@
+<label class="option" [class.disabled]="!selectable()" [class.selected]="selected()">
+  <input
+    type="radio"
+    [name]="group()"
+    [checked]="selected()"
+    [disabled]="!selectable()"
+    (change)="select.emit()"
+  />
+  <span class="info">
+    <span class="hc-body-strong name">{{ name() }}</span>
+    @if (details()) {
+      <span class="hc-caption details">{{ details() }}</span>
+    }
+    @if (reason()) {
+      <span class="hc-caption reason">{{ reason() }}</span>
+    }
+  </span>
+  @if (workload()) {
+    <span class="hc-caption workload">{{ workload() }}</span>
+  }
+</label>
