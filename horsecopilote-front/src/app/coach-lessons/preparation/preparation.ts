@@ -12,8 +12,8 @@ import { Badge } from '../../decor/badge/badge';
 import { Callout } from '../../decor/callout/callout';
 import {
   LESSON_STATUS_LABELS,
-  LESSON_TYPE_LABELS,
-  LOCATION_LABELS,
+  locationLabel,
+  topicLabel,
   longDateLabel,
   timeRange,
 } from '../../decor/labels';
@@ -43,8 +43,8 @@ export class Preparation implements OnInit {
   private readonly router = inject(Router);
   private loadRequest = 0;
 
-  protected readonly typeLabels = LESSON_TYPE_LABELS;
-  protected readonly locationLabels = LOCATION_LABELS;
+  protected readonly topicLabel = topicLabel;
+  protected readonly locationLabel = locationLabel;
   protected readonly statusLabels = LESSON_STATUS_LABELS;
 
   protected readonly weekStart = signal(mondayOf(new Date()));

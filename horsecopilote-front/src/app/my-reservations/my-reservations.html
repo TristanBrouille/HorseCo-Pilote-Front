@@ -120,7 +120,7 @@
 <hc-modal
   [title]="
     selectedLesson()
-      ? typeLabels[selectedLesson()!.topic] + ' · ' + locationLabels[selectedLesson()!.location]
+      ? topicLabel(selectedLesson()!.topic) + ' · ' + locationLabel(selectedLesson()!.location)
       : 'Cours'
   "
   [width]="520"
@@ -140,7 +140,7 @@
       </div>
       <div class="summary-row">
         <dt class="hc-body hc-muted">Lieu</dt>
-        <dd class="hc-body-strong">{{ locationLabels[lesson.location] }}</dd>
+        <dd class="hc-body-strong">{{ locationLabel(lesson.location) }}</dd>
       </div>
       <div class="summary-row">
         <dt class="hc-body hc-muted">Coach</dt>

@@ -219,11 +219,8 @@ describe('WeeklySlots', () => {
     await click(button('Générer'));
 
     const request = http.expectOne({ method: 'POST', url: `${API_URL}/lessons/generation` });
-    expect(request.request.body).toEqual({
-      untilDate: '2026-12-31',
-      topic: 'CSO',
-      location: 'CARRIERE',
-    });
+    // no topic nor location: the coach defines them
+    expect(request.request.body).toEqual({ untilDate: '2026-12-31' });
     request.flush({
       fromDate: '2026-10-31',
       untilDate: '2026-12-31',
