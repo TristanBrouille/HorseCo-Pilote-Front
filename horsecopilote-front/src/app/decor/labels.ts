@@ -1,5 +1,6 @@
 import { Role } from '../auth/authModel';
 import { HorseOption, LessonStatus, LessonType } from '../coach-lessons/coachLessonModel';
+import { parseIsoDate, timeOf } from '../coach-lessons/week/week';
 import { HorseStatus, Location } from '../horses/horseModel';
 import { LessonChangeRequestStatus } from '../my-reservations/myReservationModel';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
@@ -113,3 +114,7 @@ export const CHANGE_REQUEST_STATUS_LABELS: Record<
   ACCEPTEE: { label: 'Acceptée', tone: 'success' },
   REFUSEE: { label: 'Refusée', tone: 'danger' },
 };
+
+// 'Lun. 12 oct. 18:00 · CSO'
+export const changeRequestLessonLabel = (startDatetime: string, topic: LessonType) =>
+  `${shortDateLabel(parseIsoDate(startDatetime)!)} ${timeOf(startDatetime)} · ${LESSON_TYPE_LABELS[topic]}`;

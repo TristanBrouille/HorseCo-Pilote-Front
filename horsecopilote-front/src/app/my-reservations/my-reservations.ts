@@ -28,6 +28,7 @@ import {
   LESSON_STATUS_LABELS,
   LESSON_TYPE_LABELS,
   LOCATION_LABELS,
+  changeRequestLessonLabel,
   dayMonthYearLabel,
   longDateLabel,
   shortDateLabel,
@@ -94,6 +95,7 @@ export class MyReservations implements OnInit {
   protected readonly locationLabels = LOCATION_LABELS;
   protected readonly statusLabels = LESSON_STATUS_LABELS;
   protected readonly requestStatusLabels = CHANGE_REQUEST_STATUS_LABELS;
+  protected readonly requestLessonLabel = changeRequestLessonLabel;
   protected readonly isUpcoming = isUpcoming;
   protected readonly timeRange = timeRange;
   protected readonly timeOf = timeOf;
@@ -214,10 +216,6 @@ export class MyReservations implements OnInit {
       `${timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime))} · ` +
       `${LESSON_TYPE_LABELS[lesson.topic]} · ${coachName(lesson)}`
     );
-  }
-
-  protected requestLessonLabel(startDatetime: string, topic: MemberLesson['topic']): string {
-    return `${shortDateLabel(parseIsoDate(startDatetime)!)} ${timeOf(startDatetime)} · ${LESSON_TYPE_LABELS[topic]}`;
   }
 
   protected async previousWeek(): Promise<void> {

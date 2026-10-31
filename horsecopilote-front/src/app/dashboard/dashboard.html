@@ -1,6 +1,54 @@
 <main class="page">
   <hc-page-header [title]="title()" [subtitle]="subtitle()" />
 
+  @if (isAdmin()) {
+    <section aria-labelledby="requests-title">
+      <h2 id="requests-title" class="hc-title-2">Demandes de modification de cours</h2>
+      @if (decisionError()) {
+        <p class="error-banner" role="alert">{{ decisionError() }}</p>
+      }
+      @if (changeRequests().length) {
+        <ul class="request-list">
+          @for (request of changeRequests(); track request.id) {
+            <li class="request-row">
+              <span class="request-info">
+                <span class="hc-body-strong">
+                  {{ request.memberFirstName }} {{ request.memberLastName }}
+                </span>
+                <span class="hc-body">
+                  {{ lessonLabel(request.fromStartDatetime, request.fromTopic) }} →
+                  {{ lessonLabel(request.toStartDatetime, request.toTopic) }}
+                </span>
+                <span class="hc-caption hc-muted">{{ request.reason }}</span>
+              </span>
+              <span class="request-actions">
+                <button
+                  hc-button
+                  variant="secondary"
+                  type="button"
+                  [disabled]="deciding() !== null"
+                  (click)="decide(request, false)"
+                >
+                  Refuser
+                </button>
+                <button
+                  hc-button
+                  type="button"
+                  [disabled]="deciding() !== null"
+                  (click)="decide(request, true)"
+                >
+                  Accepter
+                </button>
+              </span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="hc-body hc-muted">Aucune demande en attente.</p>
+      }
+    </section>
+  }
+
   <section aria-labelledby="features-title">
     <h2 id="features-title" class="hc-title-2">Vos fonctionnalités</h2>
 
