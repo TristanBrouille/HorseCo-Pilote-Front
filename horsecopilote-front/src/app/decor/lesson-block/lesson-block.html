@@ -1,0 +1,8 @@
+<span class="top">
+  <span class="time hc-caption">{{ lesson().time }}</span>
+  @if (badge(); as badge) {
+    <hc-badge [tone]="badge.tone">{{ badge.label }}</hc-badge>
+  }
+</span>
+<span class="title hc-body-strong">{{ lesson().topic }} · {{ lesson().location }}</span>
+<span class="details hc-caption">{{ lesson().details }}</span>

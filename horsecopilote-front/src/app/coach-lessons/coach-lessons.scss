@@ -1,0 +1,117 @@
+@use '../../styles/calendar';
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-6);
+  padding: var(--hc-page-padding);
+}
+
+.error-banner {
+  margin: 0;
+  padding: var(--hc-space-3) var(--hc-space-4);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-status-danger-soft);
+  color: var(--hc-status-danger);
+  font: var(--hc-text-body);
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--hc-space-2);
+}
+
+.week-label {
+  min-width: 200px;
+  color: var(--hc-text-primary);
+  text-align: center;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--hc-space-2) var(--hc-space-5);
+  margin: 0;
+  padding: 0;
+  color: var(--hc-text-muted);
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--hc-space-2);
+  }
+}
+
+// same colours as the hc-lesson-block states
+.swatch {
+  box-sizing: border-box;
+  width: 16px;
+  height: 12px;
+  border: 1px solid;
+  border-radius: var(--hc-radius-pill);
+}
+
+.swatch-mine {
+  border-color: var(--hc-brand-primary);
+  background: var(--hc-brand-primary-soft);
+}
+
+.swatch-late {
+  border: 2px solid var(--hc-highlight-late);
+  background: var(--hc-highlight-late-soft);
+}
+
+.swatch-other {
+  border-color: var(--hc-border-strong);
+  background: var(--hc-bg-surface);
+}
+
+.swatch-cancelled {
+  border-color: var(--hc-border-default);
+  background: var(--hc-bg-disabled);
+}
+
+// Monday to Saturday by default (skill: hour column + 6 day columns); --days adds Sunday when needed
+@include calendar.grid(6);
+
+.hour-row {
+  box-sizing: border-box;
+  flex: 0 0 var(--hour-height);
+  border-top: 1px solid var(--hc-border-default);
+
+  &:first-child {
+    border-top: none;
+  }
+}
+
+.lesson {
+  @include calendar.block-position;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-2);
+  margin: 0;
+  padding: var(--hc-space-4);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-bg-page);
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hc-space-3);
+
+  dt,
+  dd {
+    margin: 0;
+  }
+}
+
+.participants-title {
+  margin: 0;
+}

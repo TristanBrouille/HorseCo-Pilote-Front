@@ -44,7 +44,7 @@
             (click)="openCreate(column.day, time)"
           ></button>
         }
-        @for (block of column.blocks; track block.slot.id) {
+        @for (block of column.blocks; track block.item.id) {
           <button
             type="button"
             class="slot-block"
@@ -56,24 +56,24 @@
               'Modifier le créneau du ' +
               dayLabels[column.day] +
               ' ' +
-              timeRange(block.slot.startTime, block.slot.endTime) +
+              timeRange(block.item.startTime, block.item.endTime) +
               ' avec ' +
-              block.slot.coach.firstName +
+              block.item.coach.firstName +
               ' ' +
-              block.slot.coach.lastName
+              block.item.coach.lastName
             "
-            (click)="openEdit(block.slot)"
+            (click)="openEdit(block.item)"
           >
             <span class="block-top">
               <span class="hc-caption hc-muted">
-                {{ timeRange(block.slot.startTime, block.slot.endTime) }}
+                {{ timeRange(block.item.startTime, block.item.endTime) }}
               </span>
-              <hc-badge tone="brand">{{ levelLabel(block.slot.requiredLevel) }}</hc-badge>
+              <hc-badge tone="brand">{{ levelLabel(block.item.requiredLevel) }}</hc-badge>
             </span>
             <span class="coach hc-body-strong">
-              {{ block.slot.coach.firstName }} {{ block.slot.coach.lastName }}
+              {{ block.item.coach.firstName }} {{ block.item.coach.lastName }}
             </span>
-            <span class="hc-caption hc-muted">{{ block.slot.maxCapacity }} places</span>
+            <span class="hc-caption hc-muted">{{ block.item.maxCapacity }} places</span>
           </button>
         }
       </div>

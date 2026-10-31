@@ -1,3 +1,5 @@
+@use '../../styles/calendar';
+
 .page {
   display: flex;
   flex-direction: column;
@@ -24,54 +26,7 @@
   }
 }
 
-.calendar {
-  --hour-height: 80px;
-
-  display: grid;
-  grid-template-columns: 64px repeat(7, minmax(0, 1fr));
-  overflow: hidden;
-  border: 1px solid var(--hc-border-default);
-  border-radius: var(--hc-radius-lg);
-  background: var(--hc-bg-surface);
-}
-
-.corner,
-.day-header {
-  padding: var(--hc-space-2-5) var(--hc-space-3);
-  border-bottom: 1px solid var(--hc-border-default);
-  background: var(--hc-bg-subtle);
-}
-
-.day-header {
-  border-left: 1px solid var(--hc-border-default);
-  color: var(--hc-text-primary);
-}
-
-.hour-labels {
-  display: flex;
-  flex-direction: column;
-}
-
-.hour-label {
-  box-sizing: border-box;
-  height: var(--hour-height);
-  padding: var(--hc-space-1) var(--hc-space-2);
-  border-top: 1px solid var(--hc-border-default);
-  color: var(--hc-text-muted);
-  text-align: right;
-
-  &:first-child {
-    border-top: none;
-  }
-}
-
-.day-column {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: calc(var(--hour-height) * var(--hours));
-  border-left: 1px solid var(--hc-border-default);
-}
+@include calendar.grid(7);
 
 .hour-cell {
   flex: 0 0 calc(var(--hour-height) / 2);
@@ -95,18 +50,12 @@
 }
 
 .slot-block {
-  position: absolute;
-  // 2px inset so adjacent blocks never touch
-  top: calc(var(--hour-height) * var(--top) + 2px);
-  left: calc(100% * var(--lane) / var(--lanes) + 2px);
-  box-sizing: border-box;
+  @include calendar.block-position;
+
   display: flex;
   flex-direction: column;
   gap: 2px;
-  width: calc(100% / var(--lanes) - 4px);
-  height: calc(var(--hour-height) * var(--height) - 4px);
   padding: var(--hc-space-2) var(--hc-space-2-5);
-  overflow: hidden;
   border: 1px solid var(--hc-brand-primary);
   border-radius: var(--hc-radius-md);
   background: var(--hc-brand-primary-soft);
