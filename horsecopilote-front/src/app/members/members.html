@@ -1,0 +1,60 @@
+<main class="page">
+  <hc-page-header
+    title="Membres"
+    subtitle="Les cavaliers du centre : niveau de galop, taille et poids."
+  >
+    <button hc-button actions type="button" (click)="openCreate()">Ajouter un membre</button>
+  </hc-page-header>
+
+  @if (loadError()) {
+    <p class="error-banner" role="alert">{{ loadError() }}</p>
+  }
+
+  <ag-grid-angular
+    class="grid"
+    [theme]="theme"
+    [rowData]="members()"
+    [columnDefs]="columns"
+    [localeText]="localeText"
+    domLayout="autoHeight"
+  />
+</main>
+
+<hc-modal title="Ajouter un membre" [width]="600" [(open)]="formOpen">
+  <form id="member-form" class="form-grid" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <hc-field label="Prénom" [error]="fieldError('firstName')">
+      <input type="text" maxlength="100" autocomplete="off" formControlName="firstName" />
+    </hc-field>
+    <hc-field label="Nom" [error]="fieldError('lastName')">
+      <input type="text" maxlength="100" autocomplete="off" formControlName="lastName" />
+    </hc-field>
+    <hc-field label="Email" [error]="fieldError('email')">
+      <input type="email" maxlength="255" autocomplete="off" formControlName="email" />
+    </hc-field>
+    <hc-field
+      label="Mot de passe provisoire"
+      hint="8 caractères minimum"
+      [error]="fieldError('password')"
+    >
+      <input type="password" autocomplete="new-password" formControlName="password" />
+    </hc-field>
+    <hc-field label="Niveau (galop)" [error]="fieldError('galopLevel')">
+      <input type="number" min="0" max="7" formControlName="galopLevel" />
+    </hc-field>
+    <hc-field label="Taille (cm)" [error]="fieldError('heightCm')">
+      <input type="number" min="80" max="220" formControlName="heightCm" />
+    </hc-field>
+    <hc-field label="Poids (kg)" [error]="fieldError('weightKg')">
+      <input type="number" min="15" max="150" step="0.5" formControlName="weightKg" />
+    </hc-field>
+  </form>
+  @if (actionError()) {
+    <p class="error-banner" role="alert">{{ actionError() }}</p>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="formOpen.set(false)">
+    Annuler
+  </button>
+  <button hc-button actions type="submit" form="member-form" [disabled]="saving()">
+    Ajouter le membre
+  </button>
+</hc-modal>
