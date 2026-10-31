@@ -34,3 +34,5 @@ const roleGuard =
 export const adminGuard = roleGuard('ADMIN');
 
 export const coachGuard = roleGuard('COACH');
+
+export const memberGuard = roleGuard('MEMBRE');

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Login } from './login/login';
 import { Dashboard } from './dashboard/dashboard';
-import { adminGuard, authGuard, coachGuard } from './auth/guard';
+import { adminGuard, authGuard, coachGuard, memberGuard } from './auth/guard';
 
 export const routes: Routes = [
   {
@@ -32,6 +32,11 @@ export const routes: Routes = [
     path: 'coach/cours',
     loadComponent: () => import('./coach-lessons/coach-lessons').then((m) => m.CoachLessons),
     canActivate: [coachGuard],
+  },
+  {
+    path: 'membre/cours',
+    loadComponent: () => import('./my-reservations/my-reservations').then((m) => m.MyReservations),
+    canActivate: [memberGuard],
   },
   {
     path: '**',

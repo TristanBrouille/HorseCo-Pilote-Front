@@ -1,0 +1,151 @@
+<main class="page">
+  <hc-page-header
+    title="Mes cours"
+    subtitle="Tous les cours du centre cette semaine. Les vôtres sont mis en avant : cliquez dessus pour voir le cheval qui vous est attribué."
+  >
+    <div actions class="week-nav" role="group" aria-label="Changer de semaine">
+      <button
+        hc-button
+        variant="secondary"
+        type="button"
+        aria-label="Semaine précédente"
+        (click)="previousWeek()"
+      >
+        ‹
+      </button>
+      <span class="week-label hc-body-strong" aria-live="polite">Semaine du {{ weekLabel() }}</span>
+      <button
+        hc-button
+        variant="secondary"
+        type="button"
+        aria-label="Semaine suivante"
+        (click)="nextWeek()"
+      >
+        ›
+      </button>
+      <button
+        hc-button
+        variant="ghost"
+        type="button"
+        [disabled]="isCurrentWeek()"
+        (click)="currentWeek()"
+      >
+        Cette semaine
+      </button>
+    </div>
+  </hc-page-header>
+
+  @if (loadError()) {
+    <p class="error-banner" role="alert">{{ loadError() }}</p>
+  }
+
+  @if (!loadError() && !loading()) {
+    @if (!lessons().length) {
+      <p class="hc-body hc-muted">Aucun cours prévu cette semaine.</p>
+    } @else if (!myLessonCount()) {
+      <p class="hc-body hc-muted">Vous n'avez aucun cours cette semaine.</p>
+    }
+  }
+
+  <ul class="legend hc-caption" aria-label="Légende">
+    <li><span class="swatch swatch-mine" aria-hidden="true"></span>Vos cours</li>
+    <li><span class="swatch swatch-other" aria-hidden="true"></span>Autres cours du centre</li>
+    <li><span class="swatch swatch-cancelled" aria-hidden="true"></span>Cours annulés</li>
+  </ul>
+
+  <section
+    class="calendar"
+    aria-label="Agenda hebdomadaire des cours du centre"
+    [attr.aria-busy]="loading()"
+    [style.--hours]="hours().length"
+    [style.--days]="days().length"
+  >
+    <div class="corner"></div>
+    @for (column of columns(); track column.day) {
+      <div class="day-header hc-title-2">{{ dayDates()[column.day] }}</div>
+    }
+
+    <div class="hour-labels" aria-hidden="true">
+      @for (hour of hours(); track hour) {
+        <span class="hour-label hc-caption">{{ timeLabel(hour) }}</span>
+      }
+    </div>
+
+    @for (column of columns(); track column.day) {
+      <div class="day-column" role="group" [attr.aria-label]="dayLabels[column.day]">
+        @for (hour of hours(); track hour) {
+          <div class="hour-row"></div>
+        }
+        @for (block of column.blocks; track block.item.id) {
+          <button
+            hc-lesson-block
+            class="lesson"
+            [lesson]="block.item.block"
+            [state]="block.item.state"
+            [style.--top]="block.top"
+            [style.--height]="block.height"
+            [style.--lane]="block.lane"
+            [style.--lanes]="block.lanes"
+            [attr.aria-label]="blockAriaLabel(block.item)"
+            (open)="openDetails(block.item.lesson)"
+          ></button>
+        }
+      </div>
+    }
+  </section>
+</main>
+
+<hc-modal
+  [title]="
+    selectedLesson()
+      ? typeLabels[selectedLesson()!.topic] + ' · ' + locationLabels[selectedLesson()!.location]
+      : 'Cours'
+  "
+  [width]="520"
+  [(open)]="detailsOpen"
+>
+  @if (selectedLesson(); as lesson) {
+    <dl class="summary">
+      <div class="summary-row">
+        <dt class="hc-body hc-muted">Date</dt>
+        <dd class="hc-body-strong">{{ lessonDate(lesson) }}</dd>
+      </div>
+      <div class="summary-row">
+        <dt class="hc-body hc-muted">Horaire</dt>
+        <dd class="hc-body-strong">
+          {{ timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime)) }}
+        </dd>
+      </div>
+      <div class="summary-row">
+        <dt class="hc-body hc-muted">Lieu</dt>
+        <dd class="hc-body-strong">{{ locationLabels[lesson.location] }}</dd>
+      </div>
+      <div class="summary-row">
+        <dt class="hc-body hc-muted">Coach</dt>
+        <dd class="hc-body-strong">{{ coachName(lesson) }}</dd>
+      </div>
+      <div class="summary-row">
+        <dt class="hc-body hc-muted">Statut</dt>
+        <dd>
+          <hc-badge [tone]="statusLabels[lesson.status].tone">
+            {{ statusLabels[lesson.status].label }}
+          </hc-badge>
+        </dd>
+      </div>
+      @if (lesson.mine) {
+        <div class="summary-row">
+          <dt class="hc-body hc-muted">Votre cheval</dt>
+          <dd [class]="lesson.horse ? 'hc-body-strong' : 'hc-body hc-muted'">
+            {{ horseLabel(lesson) }}
+          </dd>
+        </div>
+      }
+    </dl>
+    @if (!lesson.mine) {
+      <hc-callout tone="subtle">Vous n'êtes pas inscrit à ce cours.</hc-callout>
+    }
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="detailsOpen.set(false)">
+    Fermer
+  </button>
+</hc-modal>
