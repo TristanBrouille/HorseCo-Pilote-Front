@@ -67,3 +67,44 @@ a.feature-card:hover {
   margin-top: auto;
   color: var(--hc-status-danger);
 }
+
+.error-banner {
+  margin: 0;
+  padding: var(--hc-space-3) var(--hc-space-4);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-status-danger-soft);
+  color: var(--hc-status-danger);
+  font: var(--hc-text-body);
+}
+
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.request-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hc-space-3);
+  padding: var(--hc-space-3) var(--hc-space-4);
+  border: 1px solid var(--hc-border-default);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-bg-surface);
+}
+
+.request-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-1);
+}
+
+.request-actions {
+  display: flex;
+  gap: var(--hc-space-2);
+}

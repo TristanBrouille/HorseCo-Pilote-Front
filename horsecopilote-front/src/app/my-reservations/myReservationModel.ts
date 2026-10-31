@@ -25,6 +25,8 @@ export interface LessonChangeRequestPayload {
 
 export interface LessonChangeRequest {
   id: number;
+  memberFirstName: string;
+  memberLastName: string;
   fromLessonId: number;
   fromStartDatetime: string;
   fromTopic: LessonType;
