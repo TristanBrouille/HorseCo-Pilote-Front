@@ -14,3 +14,24 @@ export interface MemberLesson {
   mine: boolean;
   horse: AssignedHorse | null;
 }
+
+export type LessonChangeRequestStatus = 'EN_ATTENTE' | 'ACCEPTEE' | 'REFUSEE';
+
+export interface LessonChangeRequestPayload {
+  fromLessonId: number;
+  toLessonId: number;
+  reason: string;
+}
+
+export interface LessonChangeRequest {
+  id: number;
+  fromLessonId: number;
+  fromStartDatetime: string;
+  fromTopic: LessonType;
+  toLessonId: number;
+  toStartDatetime: string;
+  toTopic: LessonType;
+  reason: string;
+  status: LessonChangeRequestStatus;
+  createdAt: string;
+}

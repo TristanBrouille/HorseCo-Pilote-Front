@@ -1,6 +1,7 @@
 import { Role } from '../auth/authModel';
 import { LessonStatus, LessonType } from '../coach-lessons/coachLessonModel';
 import { HorseStatus, Location } from '../horses/horseModel';
+import { LessonChangeRequestStatus } from '../my-reservations/myReservationModel';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
 import { BadgeTone } from './badge/badge';
 
@@ -77,4 +78,13 @@ export const LOCATION_LABELS: Record<Location, string> = {
   MANEGE: 'Manège',
   BOX: 'Box',
   PADOCK: 'Padock',
+};
+
+export const CHANGE_REQUEST_STATUS_LABELS: Record<
+  LessonChangeRequestStatus,
+  { label: string; tone: BadgeTone }
+> = {
+  EN_ATTENTE: { label: 'En attente', tone: 'warning' },
+  ACCEPTEE: { label: 'Acceptée', tone: 'success' },
+  REFUSEE: { label: 'Refusée', tone: 'danger' },
 };
