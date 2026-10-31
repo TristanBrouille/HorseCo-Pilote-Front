@@ -10,6 +10,7 @@ const slot = (id: number, dayOfWeek: WeeklySlot['dayOfWeek'], start: string, end
     maxCapacity: 12,
     requiredLevel: 1,
     coach: { id: id, firstName: 'C', lastName: `${id}` },
+    enrolledCount: 0,
   }) satisfies WeeklySlot;
 
 describe('calendar layout', () => {

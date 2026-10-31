@@ -73,7 +73,9 @@
             <span class="coach hc-body-strong">
               {{ block.item.coach.firstName }} {{ block.item.coach.lastName }}
             </span>
-            <span class="hc-caption hc-muted">{{ block.item.maxCapacity }} places</span>
+            <span class="hc-caption hc-muted">
+              {{ block.item.enrolledCount }}/{{ block.item.maxCapacity }} places
+            </span>
           </button>
         }
       </div>
@@ -123,6 +125,69 @@
   </form>
   @if (actionError()) {
     <p class="error-banner" role="alert">{{ actionError() }}</p>
+  }
+  @if (editedSlot(); as slot) {
+    <section class="members" aria-label="Membres inscrits">
+      <h3 class="hc-title-2">
+        Membres inscrits ({{ slotMembers().length }}/{{ slot.maxCapacity }})
+      </h3>
+      @if (slotMembers().length) {
+        <ul class="member-list">
+          @for (member of slotMembers(); track member.id) {
+            <li class="member-row">
+              <span class="hc-body">{{ member.firstName }} {{ member.lastName }}</span>
+              <hc-badge tone="brand">{{ levelLabel(member.galopLevel) }}</hc-badge>
+              <button
+                hc-button
+                variant="secondary"
+                type="button"
+                [disabled]="saving()"
+                [attr.aria-label]="'Retirer ' + member.firstName + ' ' + member.lastName"
+                (click)="removeMember(member)"
+              >
+                Retirer
+              </button>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="hc-body hc-muted">Aucun membre inscrit.</p>
+      }
+      <div class="member-add">
+        <hc-field
+          label="Ajouter un membre"
+          [hint]="
+            eligibleMembers().length
+              ? null
+              : 'Aucun membre éligible (créneau complet, niveau ou horaire incompatible).'
+          "
+        >
+          <select
+            aria-label="Membre à ajouter"
+            [value]="selectedMemberId() ?? ''"
+            (change)="selectedMemberId.set(+$any($event.target).value || null)"
+          >
+            <option value="" disabled>Choisir un membre</option>
+            @for (member of eligibleMembers(); track member.id) {
+              <option [value]="member.id">
+                {{ member.firstName }} {{ member.lastName }} ({{ levelLabel(member.galopLevel) }})
+              </option>
+            }
+          </select>
+        </hc-field>
+        <button
+          hc-button
+          type="button"
+          [disabled]="saving() || selectedMemberId() === null"
+          (click)="addMember()"
+        >
+          Ajouter
+        </button>
+      </div>
+      @if (memberError()) {
+        <p class="error-banner" role="alert">{{ memberError() }}</p>
+      }
+    </section>
   }
   @if (editedSlot(); as slot) {
     <button

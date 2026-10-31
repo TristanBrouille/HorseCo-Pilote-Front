@@ -16,7 +16,7 @@ import { DAY_LABELS, levelLabel, timeRange } from '../decor/labels';
 import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { Coach } from '../coaches/coachModel';
-import { DayOfWeek, WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
+import { DayOfWeek, SlotMember, WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
 import { calendarHours, dayColumns } from '../decor/calendar-layout/calendar-layout';
 import { WeeklySlotsService } from './weekly-slots-service';
 
@@ -24,7 +24,13 @@ const SAVE_ERRORS: Record<number, string> = {
   400: 'Certaines valeurs sont invalides.',
   403: 'Seul un administrateur peut modifier les créneaux.',
   404: "Ce coach ou ce créneau n'existe plus. Rechargez la page.",
-  409: 'Ce coach a déjà un créneau qui chevauche cet horaire.',
+  409: 'Ce coach a déjà un créneau qui chevauche cet horaire, ou un membre inscrit ne respecte plus les places, le niveau ou ses autres horaires.',
+};
+
+const MEMBER_ERRORS: Record<number, string> = {
+  403: 'Seul un administrateur peut gérer les inscrits.',
+  404: "Ce membre ou ce créneau n'existe plus. Rechargez la page.",
+  409: 'Ce membre ne peut pas être ajouté : créneau complet, niveau insuffisant ou déjà inscrit sur cet horaire.',
 };
 
 @Component({
@@ -63,6 +69,11 @@ export class WeeklySlots implements OnInit {
   protected readonly editedSlot = signal<WeeklySlot | null>(null);
   protected deleteOpen = signal(false);
   protected readonly slotToDelete = signal<WeeklySlot | null>(null);
+  protected readonly slotMembers = signal<SlotMember[]>([]);
+  // computed by the API (level, capacity, overlaps): the front only displays it
+  protected readonly eligibleMembers = signal<SlotMember[]>([]);
+  protected readonly selectedMemberId = signal<number | null>(null);
+  protected readonly memberError = signal<string | null>(null);
 
   protected readonly form = this.fb.group({
     coachId: this.fb.control<number | null>(null, Validators.required),
@@ -96,7 +107,43 @@ export class WeeklySlots implements OnInit {
       requiredLevel: slot.requiredLevel,
     });
     this.actionError.set(null);
+    this.memberError.set(null);
+    this.slotMembers.set([]);
+    this.eligibleMembers.set([]);
     this.formOpen.set(true);
+    this.runMemberAction(() => this.weeklySlotsService.getMembers(slot.id));
+  }
+
+  protected addMember() {
+    const memberId = this.selectedMemberId();
+    if (memberId !== null) {
+      this.runMemberAction(() =>
+        this.weeklySlotsService.addMember(this.editedSlot()!.id, memberId),
+      );
+    }
+  }
+
+  protected removeMember(member: SlotMember) {
+    this.runMemberAction(() =>
+      this.weeklySlotsService.removeMember(this.editedSlot()!.id, member.id),
+    );
+  }
+
+  private async runMemberAction(action: () => Promise<SlotMember[]>): Promise<void> {
+    const slotId = this.editedSlot()!.id;
+    this.saving.set(true);
+    this.memberError.set(null);
+    try {
+      this.slotMembers.set(await action());
+      this.eligibleMembers.set(await this.weeklySlotsService.getEligibleMembers(slotId));
+      this.selectedMemberId.set(null);
+      await this.loadSlots();
+    } catch (error) {
+      const status = (error as HttpErrorResponse).status;
+      this.memberError.set(MEMBER_ERRORS[status] ?? "L'opération a échoué. Réessayez.");
+    } finally {
+      this.saving.set(false);
+    }
   }
 
   protected async save(): Promise<void> {

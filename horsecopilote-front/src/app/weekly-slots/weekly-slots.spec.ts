@@ -14,7 +14,11 @@ const SLOT: WeeklySlot = {
   maxCapacity: 12,
   requiredLevel: 3,
   coach: { id: 7, firstName: 'Claire', lastName: 'Durand' },
+  enrolledCount: 1,
 };
+
+const ENROLLED = { id: 5, firstName: 'Léa', lastName: 'Martin', galopLevel: 4 };
+const CANDIDATE = { id: 6, firstName: 'Hugo', lastName: 'Petit', galopLevel: 3 };
 
 // jsdom does not implement the modal <dialog> API that browsers provide.
 HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
@@ -85,7 +89,7 @@ describe('WeeklySlots', () => {
     expect(block.textContent).toContain('18:00 – 19:00');
     expect(block.textContent).toContain('Claire Durand');
     expect(block.textContent).toContain('Galop 3');
-    expect(block.textContent).toContain('12 places');
+    expect(block.textContent).toContain('1/12 places');
   });
 
   it('creates a slot from the header button and reloads the calendar', async () => {
@@ -146,8 +150,56 @@ describe('WeeklySlots', () => {
     http.expectNone({ method: 'POST' });
   });
 
-  it('explains a coach overlap returned by the server', async () => {
+  async function openSlot() {
     await click(root.querySelector<HTMLElement>('.slot-block')!);
+    http.expectOne(`${API_URL}/weekly-slots/1/members`).flush([ENROLLED]);
+    await settle();
+    http.expectOne(`${API_URL}/weekly-slots/1/eligible-members`).flush([CANDIDATE]);
+    await settle();
+    http.expectOne(`${API_URL}/weekly-slots`).flush([SLOT]);
+    await settle();
+  }
+
+  it('lists the enrolled members and adds an eligible one', async () => {
+    await openSlot();
+    expect(root.querySelector('.member-list')!.textContent).toContain('Léa Martin');
+
+    const select = root.querySelector<HTMLSelectElement>('select[aria-label="Membre à ajouter"]')!;
+    select.value = '6';
+    select.dispatchEvent(new Event('change'));
+    await settle();
+    await click(button('Ajouter'));
+
+    http
+      .expectOne({ method: 'POST', url: `${API_URL}/weekly-slots/1/members/6` })
+      .flush([CANDIDATE, ENROLLED]);
+    await settle();
+    http.expectOne(`${API_URL}/weekly-slots/1/eligible-members`).flush([]);
+    await settle();
+    http.expectOne(`${API_URL}/weekly-slots`).flush([{ ...SLOT, enrolledCount: 2 }]);
+    await settle();
+
+    expect(root.querySelector('.member-list')!.textContent).toContain('Hugo Petit');
+    expect(root.textContent).toContain('Aucun membre éligible');
+  });
+
+  it('removes an enrolled member', async () => {
+    await openSlot();
+
+    await click(root.querySelector<HTMLElement>('[aria-label="Retirer Léa Martin"]')!);
+
+    http.expectOne({ method: 'DELETE', url: `${API_URL}/weekly-slots/1/members/5` }).flush([]);
+    await settle();
+    http.expectOne(`${API_URL}/weekly-slots/1/eligible-members`).flush([CANDIDATE, ENROLLED]);
+    await settle();
+    http.expectOne(`${API_URL}/weekly-slots`).flush([{ ...SLOT, enrolledCount: 0 }]);
+    await settle();
+
+    expect(root.textContent).toContain('Aucun membre inscrit.');
+  });
+
+  it('explains a coach overlap returned by the server', async () => {
+    await openSlot();
 
     await click(button('Enregistrer'));
     http
@@ -155,11 +207,11 @@ describe('WeeklySlots', () => {
       .flush({ detail: 'overlap' }, { status: 409, statusText: 'Conflict' });
     await settle();
 
-    expect(root.textContent).toContain('Ce coach a déjà un créneau qui chevauche cet horaire.');
+    expect(root.textContent).toContain('Ce coach a déjà un créneau qui chevauche cet horaire');
   });
 
   it('deletes a slot after confirmation', async () => {
-    await click(root.querySelector<HTMLElement>('.slot-block')!);
+    await openSlot();
     await click(button('Supprimer le créneau'));
 
     await click(button('Supprimer'));
