@@ -1,4 +1,6 @@
 import { Coach } from '../coaches/coachModel';
+import { LessonType } from '../coach-lessons/coachLessonModel';
+import { Location } from '../horses/horseModel';
 
 export type DayOfWeek =
   'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
@@ -19,6 +21,23 @@ export interface SlotMember {
   firstName: string;
   lastName: string;
   galopLevel: number;
+}
+
+// POST /lessons/generation (admin): lessons of every slot from now until untilDate ('YYYY-MM-DD')
+export interface LessonGenerationRequest {
+  untilDate: string;
+  topic: LessonType;
+  location: Location;
+}
+
+// skippedCount: lessons that already existed, or whose coach was already teaching at that time
+export interface LessonGenerationResult {
+  fromDate: string;
+  untilDate: string;
+  createdCount: number;
+  skippedCount: number;
+  // members of the slots booked into the created lessons, without validation
+  bookingCount: number;
 }
 
 export interface WeeklySlotRequest {

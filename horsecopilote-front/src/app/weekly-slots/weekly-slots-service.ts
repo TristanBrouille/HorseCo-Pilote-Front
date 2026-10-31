@@ -1,11 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { SlotMember, WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
+import {
+  LessonGenerationRequest,
+  LessonGenerationResult,
+  SlotMember,
+  WeeklySlot,
+  WeeklySlotRequest,
+} from './weeklySlotModel';
 
 @Injectable({ providedIn: 'root' })
 export class WeeklySlotsService {
   private readonly baseUrl = 'http://localhost:8080/weekly-slots';
+  private readonly lessonsUrl = 'http://localhost:8080/lessons';
   private readonly http = inject(HttpClient);
 
   getAll(): Promise<WeeklySlot[]> {
@@ -22,6 +29,13 @@ export class WeeklySlotsService {
 
   delete(id: number): Promise<void> {
     return firstValueFrom(this.http.delete<void>(`${this.baseUrl}/${id}`));
+  }
+
+  // Creates the lessons of every slot up to the given date; existing lessons are kept.
+  generateLessons(request: LessonGenerationRequest): Promise<LessonGenerationResult> {
+    return firstValueFrom(
+      this.http.post<LessonGenerationResult>(`${this.lessonsUrl}/generation`, request),
+    );
   }
 
   getMembers(id: number): Promise<SlotMember[]> {

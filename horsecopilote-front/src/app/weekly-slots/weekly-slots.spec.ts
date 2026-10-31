@@ -210,6 +210,35 @@ describe('WeeklySlots', () => {
     expect(root.textContent).toContain('Ce coach a déjà un créneau qui chevauche cet horaire');
   });
 
+  it('generates the lessons of every slot up to the chosen date', async () => {
+    await click(button('Générer les leçons'));
+    const date = root.querySelector<HTMLInputElement>('input[formcontrolname="untilDate"]')!;
+    date.value = '2026-12-31';
+    date.dispatchEvent(new Event('input'));
+
+    await click(button('Générer'));
+
+    const request = http.expectOne({ method: 'POST', url: `${API_URL}/lessons/generation` });
+    expect(request.request.body).toEqual({
+      untilDate: '2026-12-31',
+      topic: 'CSO',
+      location: 'CARRIERE',
+    });
+    request.flush({
+      fromDate: '2026-10-31',
+      untilDate: '2026-12-31',
+      createdCount: 9,
+      skippedCount: 1,
+      bookingCount: 27,
+    });
+    await settle();
+
+    expect(root.querySelector('.success-banner')!.textContent).toContain(
+      "9 leçons créées jusqu'au 31 décembre 2026, avec 27 participants inscrits d'office.",
+    );
+    expect(root.querySelector('.success-banner')!.textContent).toContain('1 leçon ignorée');
+  });
+
   it('deletes a slot after confirmation', async () => {
     await openSlot();
     await click(button('Supprimer le créneau'));

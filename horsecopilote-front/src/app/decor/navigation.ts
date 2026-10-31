@@ -66,17 +66,18 @@ export const NAVIGATION_BY_ROLE: Record<Role, RoleNavigation> = {
       {
         label: 'Créneaux hebdomadaires',
         description:
-          'Planifiez les créneaux d’une heure de la semaine : coach, niveau et capacité.',
+          'Planifiez les créneaux d’une heure de la semaine et générez leurs leçons jusqu’à une date.',
         route: '/admin/creneaux',
+      },
+      {
+        label: 'Toutes les leçons',
+        description:
+          'Le calendrier de toutes les leçons : changez leur coach, sujet, lieu, statut et chevaux.',
+        route: '/admin/lecons',
       },
       {
         label: 'Coachs',
         description: 'Créez les comptes des moniteurs du centre.',
-        route: null,
-      },
-      {
-        label: 'Toutes les leçons',
-        description: 'Consultez, modifiez ou annulez les leçons de tous les coachs.',
         route: null,
       },
     ],

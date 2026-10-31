@@ -1,7 +1,11 @@
 <main class="page">
   <hc-page-header
-    title="Agenda de la semaine"
-    subtitle="Toutes les leçons du centre cette semaine. Les vôtres sont mises en avant : cliquez dessus pour changer leur sujet et attribuer un cheval à chaque participant."
+    [title]="admin ? 'Toutes les leçons' : 'Agenda de la semaine'"
+    [subtitle]="
+      admin
+        ? 'Toutes les leçons du centre cette semaine. Cliquez sur une leçon pour changer son coach, son sujet, son lieu ou son statut, et attribuer les chevaux.'
+        : 'Toutes les leçons du centre cette semaine. Les vôtres sont mises en avant : cliquez dessus pour changer leur sujet et attribuer un cheval à chaque participant.'
+    "
   >
     <app-week-nav actions [weekStart]="weekStart()" (weekChange)="goToWeek($event)" />
   </hc-page-header>
@@ -26,11 +30,18 @@
   }
 
   <ul class="legend hc-caption" aria-label="Légende">
-    <li><span class="swatch swatch-mine" aria-hidden="true"></span>Vos leçons</li>
-    <li>
-      <span class="swatch swatch-late" aria-hidden="true"></span>Vos leçons avec un nouvel inscrit
-    </li>
-    <li><span class="swatch swatch-other" aria-hidden="true"></span>Leçons des autres coachs</li>
+    @if (admin) {
+      <li><span class="swatch swatch-mine" aria-hidden="true"></span>Leçons prévues</li>
+      <li>
+        <span class="swatch swatch-late" aria-hidden="true"></span>Leçons avec un nouvel inscrit
+      </li>
+    } @else {
+      <li><span class="swatch swatch-mine" aria-hidden="true"></span>Vos leçons</li>
+      <li>
+        <span class="swatch swatch-late" aria-hidden="true"></span>Vos leçons avec un nouvel inscrit
+      </li>
+      <li><span class="swatch swatch-other" aria-hidden="true"></span>Leçons des autres coachs</li>
+    }
     <li><span class="swatch swatch-cancelled" aria-hidden="true"></span>Leçons annulées</li>
   </ul>
 
@@ -121,8 +132,13 @@
       </div>
     </dl>
 
-    @if (lesson.mine && lesson.participants) {
-      <app-lesson-editor [lesson]="lesson" (changed)="onLessonChanged($event)" />
+    @if (lesson.editable && lesson.participants) {
+      <app-lesson-editor
+        [lesson]="lesson"
+        [admin]="admin"
+        [coaches]="coaches()"
+        (changed)="onLessonChanged($event)"
+      />
     } @else {
       <hc-callout tone="subtle">
         {{ participantsLabel(lesson.participantCount) }}. Seul le coach de la leçon voit la liste
