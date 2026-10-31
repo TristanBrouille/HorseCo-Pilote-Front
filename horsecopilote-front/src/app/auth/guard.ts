@@ -16,15 +16,21 @@ export const authGuard: CanActivateFn = async () => {
   }
 };
 
-// UI only: the back refuses non-admin writes anyway.
-export const adminGuard: CanActivateFn = async () => {
-  const router = inject(Router);
-  const authService = inject(AuthService);
+// UI only: the back checks the role of every request anyway.
+const roleGuard =
+  (role: string): CanActivateFn =>
+  async () => {
+    const router = inject(Router);
+    const authService = inject(AuthService);
 
-  try {
-    const me = await authService.getMe();
-    return me.role === 'ADMIN' ? true : router.createUrlTree(['/']);
-  } catch {
-    return router.createUrlTree(['/login']);
-  }
-};
+    try {
+      const me = await authService.getMe();
+      return me.role === role ? true : router.createUrlTree(['/']);
+    } catch {
+      return router.createUrlTree(['/login']);
+    }
+  };
+
+export const adminGuard = roleGuard('ADMIN');
+
+export const coachGuard = roleGuard('COACH');

@@ -17,7 +17,7 @@ import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { Coach } from '../coaches/coachModel';
 import { DayOfWeek, WeeklySlot, WeeklySlotRequest } from './weeklySlotModel';
-import { calendarHours, dayColumns } from './calendar-layout/calendar-layout';
+import { calendarHours, dayColumns } from '../decor/calendar-layout/calendar-layout';
 import { WeeklySlotsService } from './weekly-slots-service';
 
 const SAVE_ERRORS: Record<number, string> = {
@@ -59,9 +59,9 @@ export class WeeklySlots implements OnInit {
   protected readonly actionError = signal<string | null>(null);
   protected readonly saving = signal(false);
 
-  protected readonly formOpen = signal(false);
+  protected formOpen = signal(false);
   protected readonly editedSlot = signal<WeeklySlot | null>(null);
-  protected readonly deleteOpen = signal(false);
+  protected deleteOpen = signal(false);
   protected readonly slotToDelete = signal<WeeklySlot | null>(null);
 
   protected readonly form = this.fb.group({
