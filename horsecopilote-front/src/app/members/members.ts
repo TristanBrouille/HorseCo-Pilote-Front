@@ -66,11 +66,7 @@ export class Members implements OnInit {
     firstName: this.fb.control('', [Validators.required, Validators.maxLength(100)]),
     lastName: this.fb.control('', [Validators.required, Validators.maxLength(100)]),
     email: this.fb.control('', [Validators.required, Validators.email, Validators.maxLength(255)]),
-    password: this.fb.control('', [
-      Validators.required,
-      Validators.minLength(8),
-      Validators.maxLength(72),
-    ]),
+    password: this.fb.control('', [Validators.required, Validators.minLength(8)]),
     galopLevel: this.fb.control(1, this.bounds('galopLevel')),
     heightCm: this.fb.control(160, this.bounds('heightCm')),
     weightKg: this.fb.control(55, this.bounds('weightKg')),
@@ -121,7 +117,7 @@ export class Members implements OnInit {
       return "Format d'email invalide.";
     }
     if (name === 'password') {
-      return 'Entre 8 et 72 caractères.';
+      return '8 caractères minimum.';
     }
     return '100 caractères au maximum.';
   }

@@ -36,12 +36,7 @@
       hint="8 caractères minimum"
       [error]="fieldError('password')"
     >
-      <input
-        type="password"
-        maxlength="72"
-        autocomplete="new-password"
-        formControlName="password"
-      />
+      <input type="password" autocomplete="new-password" formControlName="password" />
     </hc-field>
     <hc-field label="Niveau (galop)" [error]="fieldError('galopLevel')">
       <input type="number" min="0" max="7" formControlName="galopLevel" />
