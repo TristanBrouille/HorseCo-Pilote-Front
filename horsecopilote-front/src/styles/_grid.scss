@@ -10,6 +10,10 @@
   align-items: center;
 }
 
+.hc-cell-muted {
+  color: var(--hc-text-muted);
+}
+
 .hc-header-hidden .ag-header-cell-text {
   position: absolute;
   width: 1px;

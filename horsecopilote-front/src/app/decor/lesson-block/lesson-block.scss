@@ -1,0 +1,92 @@
+:host {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--hc-space-2) var(--hc-space-2-5);
+  border: 1px solid var(--hc-brand-primary);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-brand-primary-soft);
+  color: var(--hc-text-primary);
+  text-align: left;
+  cursor: pointer;
+
+  // lines keep their height; when space runs out the last one (details) is clipped first
+  > * {
+    flex-shrink: 0;
+  }
+}
+
+// inset shadow instead of a thicker border, so the content does not shift
+:host(:hover) {
+  box-shadow: inset 0 0 0 1px var(--hc-brand-primary);
+}
+
+:host(:focus-visible) {
+  outline: 2px solid var(--hc-highlight-late);
+  outline-offset: 2px;
+}
+
+:host(.state-late) {
+  border: 2px solid var(--hc-highlight-late);
+  background: var(--hc-highlight-late-soft);
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px var(--hc-highlight-late);
+  }
+}
+
+:host(.state-cancelled) {
+  border-color: var(--hc-border-default);
+  background: var(--hc-bg-disabled);
+  color: var(--hc-text-disabled);
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px var(--hc-border-strong);
+  }
+
+  .time,
+  .details {
+    color: var(--hc-text-disabled);
+  }
+}
+
+:host(.state-other) {
+  border-color: var(--hc-border-strong);
+  background: var(--hc-bg-surface);
+  color: var(--hc-text-muted);
+
+  &:hover {
+    box-shadow: inset 0 0 0 1px var(--hc-border-strong);
+  }
+
+  .title {
+    font: var(--hc-text-body);
+  }
+}
+
+:host(.state-to-create) {
+  border: 1px dashed var(--hc-border-strong);
+  background: var(--hc-bg-page);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hc-space-1);
+  white-space: nowrap;
+}
+
+.time,
+.details {
+  color: var(--hc-text-muted);
+}
+
+.title,
+.details {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
