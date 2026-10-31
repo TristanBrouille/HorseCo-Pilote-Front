@@ -1,0 +1,10 @@
+@if (user(); as user) {
+  <hc-sidebar class="sidebar" [role]="user.role" />
+
+  <div class="main">
+    <hc-app-header [user]="user" [loggingOut]="loggingOut()" (logout)="logout()" />
+    <div class="content">
+      <router-outlet />
+    </div>
+  </div>
+}

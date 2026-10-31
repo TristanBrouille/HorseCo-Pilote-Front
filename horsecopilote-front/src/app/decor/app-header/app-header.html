@@ -1,0 +1,20 @@
+<p class="date hc-label hc-muted">{{ today }}</p>
+
+<div class="user">
+  <span class="avatar hc-caption" aria-hidden="true">{{ initials() }}</span>
+  <div class="identity">
+    <span class="hc-body-strong">{{ fullName() }}</span>
+    <span class="hc-caption hc-muted">{{ user().email }}</span>
+  </div>
+  <hc-badge [tone]="role().tone">{{ role().label }}</hc-badge>
+
+  <button
+    hc-button
+    variant="secondary"
+    type="button"
+    [disabled]="loggingOut()"
+    (click)="logout.emit()"
+  >
+    Se déconnecter
+  </button>
+</div>
