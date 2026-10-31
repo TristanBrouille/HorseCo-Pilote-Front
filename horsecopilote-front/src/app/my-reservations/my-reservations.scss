@@ -95,6 +95,50 @@
   background: var(--hc-bg-page);
 }
 
+.requests {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-3);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.request-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--hc-space-2) var(--hc-space-3);
+  padding: var(--hc-space-3) var(--hc-space-4);
+  border: 1px solid var(--hc-border-default);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-bg-surface);
+}
+
+.request-reason {
+  flex-basis: 100%;
+}
+
+.change-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-4);
+
+  p {
+    margin: 0;
+  }
+}
+
 .summary-row {
   display: flex;
   align-items: center;

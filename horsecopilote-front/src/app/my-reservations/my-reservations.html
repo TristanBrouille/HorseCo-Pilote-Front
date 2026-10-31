@@ -93,6 +93,28 @@
       </div>
     }
   </section>
+
+  <section class="requests" aria-labelledby="requests-title">
+    <h2 id="requests-title" class="hc-title-2">Mes demandes de modification</h2>
+    @if (changeRequests().length) {
+      <ul class="request-list">
+        @for (request of changeRequests(); track request.id) {
+          <li class="request-row">
+            <span class="hc-body-strong">
+              {{ requestLessonLabel(request.fromStartDatetime, request.fromTopic) }} →
+              {{ requestLessonLabel(request.toStartDatetime, request.toTopic) }}
+            </span>
+            <hc-badge [tone]="requestStatusLabels[request.status].tone">
+              {{ requestStatusLabels[request.status].label }}
+            </hc-badge>
+            <span class="request-reason hc-caption hc-muted">{{ request.reason }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="hc-body hc-muted">Aucune demande pour le moment.</p>
+    }
+  </section>
 </main>
 
 <hc-modal
@@ -144,8 +166,57 @@
     @if (!lesson.mine) {
       <hc-callout tone="subtle">Vous n'êtes pas inscrit à ce cours.</hc-callout>
     }
+    @if (lesson.mine && isUpcoming(lesson)) {
+      <button hc-button actions type="button" (click)="openChange()">
+        Demander une modification
+      </button>
+    }
   }
   <button hc-button actions variant="secondary" type="button" (click)="detailsOpen.set(false)">
     Fermer
+  </button>
+</hc-modal>
+
+<hc-modal title="Demander une modification de cours" [width]="560" [(open)]="changeOpen">
+  @if (selectedLesson(); as lesson) {
+    <form
+      id="change-form"
+      class="change-form"
+      [formGroup]="changeForm"
+      (ngSubmit)="submitChange()"
+      novalidate
+    >
+      <p class="hc-body">
+        Cours actuel : <span class="hc-body-strong">{{ targetLabel(lesson) }}</span>
+      </p>
+      <hc-field
+        label="Nouveau cours"
+        [error]="changeFieldError('toLessonId')"
+        [hint]="
+          changeTargets().length
+            ? 'Un cours de la même semaine. L\'admin validera votre demande.'
+            : 'Aucun autre cours à venir cette semaine.'
+        "
+      >
+        <select formControlName="toLessonId">
+          <option [ngValue]="null" disabled>Choisir un cours</option>
+          @for (target of changeTargets(); track target.id) {
+            <option [ngValue]="target.id">{{ targetLabel(target) }}</option>
+          }
+        </select>
+      </hc-field>
+      <hc-field label="Motif" [error]="changeFieldError('reason')" hint="500 caractères au maximum">
+        <textarea formControlName="reason" rows="4" maxlength="500"></textarea>
+      </hc-field>
+    </form>
+  }
+  @if (changeError()) {
+    <p class="error-banner" role="alert">{{ changeError() }}</p>
+  }
+  <button hc-button actions variant="secondary" type="button" (click)="changeOpen.set(false)">
+    Annuler
+  </button>
+  <button hc-button actions type="submit" form="change-form" [disabled]="saving()">
+    Envoyer la demande
   </button>
 </hc-modal>

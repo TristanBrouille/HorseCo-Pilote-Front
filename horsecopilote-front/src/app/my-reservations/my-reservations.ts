@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   addDays,
@@ -20,7 +21,9 @@ import { Badge } from '../decor/badge/badge';
 import { Button } from '../decor/button/button';
 import { CalendarEntry, calendarHours, dayColumns } from '../decor/calendar-layout/calendar-layout';
 import { Callout } from '../decor/callout/callout';
+import { Field } from '../decor/field/field';
 import {
+  CHANGE_REQUEST_STATUS_LABELS,
   DAY_LABELS,
   LESSON_STATUS_LABELS,
   LESSON_TYPE_LABELS,
@@ -35,7 +38,7 @@ import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
 import { MyReservationsService } from './my-reservations-service';
-import { MemberLesson } from './myReservationModel';
+import { LessonChangeRequest, MemberLesson } from './myReservationModel';
 
 interface LessonEntry extends CalendarEntry {
   lesson: MemberLesson;
@@ -51,6 +54,15 @@ const LOAD_ERRORS: Record<number, string> = {
   403: 'Cette page est réservée aux membres.',
 };
 
+const CHANGE_ERRORS: Record<number, string> = {
+  401: 'Votre session a expiré. Reconnectez-vous.',
+  409: 'Demande impossible : le cours choisi est complet, hors de votre niveau ou déjà passé.',
+};
+
+// only upcoming lessons can be the source or the target of a change request
+const isUpcoming = (lesson: MemberLesson) =>
+  lesson.status === 'PREVUE' && new Date(lesson.startDatetime) > new Date();
+
 const coachName = (lesson: MemberLesson) => `${lesson.coach.firstName} ${lesson.coach.lastName}`;
 
 const horseLabel = (lesson: MemberLesson) => lesson.horse?.name ?? 'Cheval non attribué';
@@ -65,7 +77,7 @@ const stateOf = (lesson: MemberLesson): LessonBlockState => {
 
 @Component({
   selector: 'app-my-reservations',
-  imports: [Badge, Button, Callout, LessonBlock, Modal, PageHeader],
+  imports: [ReactiveFormsModule, Badge, Button, Callout, Field, LessonBlock, Modal, PageHeader],
   templateUrl: './my-reservations.html',
   styleUrl: './my-reservations.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -74,12 +86,15 @@ export class MyReservations implements OnInit {
   private readonly reservationsService = inject(MyReservationsService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly fb = inject(NonNullableFormBuilder);
   private loadRequest = 0;
 
   protected readonly dayLabels = DAY_LABELS;
   protected readonly typeLabels = LESSON_TYPE_LABELS;
   protected readonly locationLabels = LOCATION_LABELS;
   protected readonly statusLabels = LESSON_STATUS_LABELS;
+  protected readonly requestStatusLabels = CHANGE_REQUEST_STATUS_LABELS;
+  protected readonly isUpcoming = isUpcoming;
   protected readonly timeRange = timeRange;
   protected readonly timeOf = timeOf;
   protected readonly coachName = coachName;
@@ -92,6 +107,20 @@ export class MyReservations implements OnInit {
   protected readonly loadError = signal<string | null>(null);
   protected readonly selectedLesson = signal<MemberLesson | null>(null);
   protected detailsOpen = signal(false);
+  protected changeOpen = signal(false);
+  protected readonly changeRequests = signal<LessonChangeRequest[]>([]);
+  protected readonly changeError = signal<string | null>(null);
+  protected readonly saving = signal(false);
+
+  protected readonly changeForm = this.fb.group({
+    toLessonId: this.fb.control<number | null>(null, Validators.required),
+    reason: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(500)]],
+  });
+
+  // other upcoming lessons of the displayed week; capacity and level are checked by the back
+  protected readonly changeTargets = computed(() =>
+    this.lessons().filter((lesson) => !lesson.mine && isUpcoming(lesson)),
+  );
 
   protected readonly weekLabel = computed(() => dayMonthYearLabel(this.weekStart()));
   protected readonly isCurrentWeek = computed(
@@ -137,7 +166,58 @@ export class MyReservations implements OnInit {
     if (requested) {
       this.weekStart.set(mondayOf(requested));
     }
-    await this.loadWeek();
+    await Promise.all([this.loadWeek(), this.loadChangeRequests()]);
+  }
+
+  protected openChange() {
+    this.changeForm.reset();
+    this.changeError.set(null);
+    this.detailsOpen.set(false);
+    this.changeOpen.set(true);
+  }
+
+  protected async submitChange(): Promise<void> {
+    if (this.changeForm.invalid) {
+      this.changeForm.markAllAsTouched();
+      return;
+    }
+    const { toLessonId, reason } = this.changeForm.getRawValue();
+    this.saving.set(true);
+    this.changeError.set(null);
+    try {
+      await this.reservationsService.createChangeRequest({
+        fromLessonId: this.selectedLesson()!.id,
+        toLessonId: toLessonId!,
+        reason: reason.trim(),
+      });
+      this.changeOpen.set(false);
+      await this.loadChangeRequests();
+    } catch (error) {
+      const status = (error as HttpErrorResponse).status;
+      this.changeError.set(CHANGE_ERRORS[status] ?? 'La demande a échoué. Réessayez.');
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  protected changeFieldError(name: 'toLessonId' | 'reason'): string | null {
+    const control = this.changeForm.controls[name];
+    if (!control.touched || control.valid) {
+      return null;
+    }
+    return control.hasError('maxlength') ? '500 caractères au maximum.' : 'Champ obligatoire.';
+  }
+
+  protected targetLabel(lesson: MemberLesson): string {
+    return (
+      `${shortDateLabel(parseIsoDate(lesson.startDatetime)!)} ` +
+      `${timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime))} · ` +
+      `${LESSON_TYPE_LABELS[lesson.topic]} · ${coachName(lesson)}`
+    );
+  }
+
+  protected requestLessonLabel(startDatetime: string, topic: MemberLesson['topic']): string {
+    return `${shortDateLabel(parseIsoDate(startDatetime)!)} ${timeOf(startDatetime)} · ${LESSON_TYPE_LABELS[topic]}`;
   }
 
   protected async previousWeek(): Promise<void> {
@@ -178,6 +258,15 @@ export class MyReservations implements OnInit {
       replaceUrl: true,
     });
     await this.loadWeek();
+  }
+
+  private async loadChangeRequests(): Promise<void> {
+    try {
+      this.changeRequests.set(await this.reservationsService.getChangeRequests());
+    } catch {
+      // the calendar banner already reports a server or session problem
+      this.changeRequests.set([]);
+    }
   }
 
   private async loadWeek(): Promise<void> {
