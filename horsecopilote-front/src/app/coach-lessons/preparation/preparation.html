@@ -41,7 +41,7 @@
               {{ lessonDate(lesson) }} · {{ lessonTime(lesson) }}
             </h2>
             <p class="hc-body hc-muted">
-              {{ typeLabels[lesson.topic] }} · {{ locationLabels[lesson.location] }}
+              {{ topicLabel(lesson.topic) }} · {{ locationLabel(lesson.location) }}
             </p>
           </div>
           <hc-badge [tone]="statusLabels[lesson.status].tone">

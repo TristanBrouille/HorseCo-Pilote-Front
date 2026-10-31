@@ -14,8 +14,12 @@
         }
       </select>
     </hc-field>
-    <hc-field label="Sujet de la leçon">
+    <hc-field
+      label="Sujet de la leçon"
+      hint="Laissez « À définir » pour que le coach le choisisse."
+    >
       <select [disabled]="savingLesson()" (change)="onTopicChange($event)">
+        <option value="" [selected]="!topic()">À définir</option>
         @for (type of lessonTypes; track type) {
           <option [value]="type" [selected]="type === topic()">{{ typeLabels[type] }}</option>
         }
@@ -23,6 +27,7 @@
     </hc-field>
     <hc-field label="Lieu">
       <select [disabled]="savingLesson()" (change)="onLocationChange($event)">
+        <option value="" [selected]="!location()">À définir</option>
         @for (place of locations; track place) {
           <option [value]="place" [selected]="place === location()">
             {{ locationLabels[place] }}
@@ -54,11 +59,25 @@
     </div>
   </div>
 } @else if (editable()) {
+  @if (missingDetails()) {
+    <hc-callout tone="late">Choisissez le sujet et le lieu de cette leçon.</hc-callout>
+  }
   <div class="topic">
     <hc-field label="Sujet de la leçon">
-      <select [disabled]="savingTopic()" (change)="onTopicChange($event)">
+      <select [disabled]="savingDetails()" (change)="onTopicChange($event)">
+        <option value="" disabled [selected]="!topic()">À définir</option>
         @for (type of lessonTypes; track type) {
           <option [value]="type" [selected]="type === topic()">{{ typeLabels[type] }}</option>
+        }
+      </select>
+    </hc-field>
+    <hc-field label="Lieu">
+      <select [disabled]="savingDetails()" (change)="onLocationChange($event)">
+        <option value="" disabled [selected]="!location()">À définir</option>
+        @for (place of locations; track place) {
+          <option [value]="place" [selected]="place === location()">
+            {{ locationLabels[place] }}
+          </option>
         }
       </select>
     </hc-field>
@@ -66,10 +85,10 @@
       hc-button
       variant="secondary"
       type="button"
-      [disabled]="!topicChanged() || savingTopic()"
-      (click)="saveTopic()"
+      [disabled]="!canSaveDetails()"
+      (click)="saveDetails()"
     >
-      Modifier le sujet
+      Enregistrer
     </button>
   </div>
 } @else {

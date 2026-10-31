@@ -5,7 +5,7 @@ import {
   CoachLesson,
   HorseAssignmentRequest,
   HorseOption,
-  LessonTopicRequest,
+  LessonDetailsRequest,
   LessonUpdateRequest,
 } from './coachLessonModel';
 
@@ -21,7 +21,7 @@ export class CoachLessonsService {
   }
 
   // Only the coach of the lesson or an admin may change it (the API answers 403 otherwise).
-  updateTopic(lessonId: number, request: LessonTopicRequest): Promise<CoachLesson> {
+  updateDetails(lessonId: number, request: LessonDetailsRequest): Promise<CoachLesson> {
     return firstValueFrom(this.http.patch<CoachLesson>(`${this.baseUrl}/${lessonId}`, request));
   }
 

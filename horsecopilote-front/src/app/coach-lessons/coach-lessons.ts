@@ -15,11 +15,11 @@ import { Callout } from '../decor/callout/callout';
 import {
   DAY_LABELS,
   LESSON_STATUS_LABELS,
-  LESSON_TYPE_LABELS,
-  LOCATION_LABELS,
+  locationLabel,
   longDateLabel,
   shortDateLabel,
   timeRange,
+  topicLabel,
 } from '../decor/labels';
 import { LessonBlock, LessonBlockData, LessonBlockState } from '../decor/lesson-block/lesson-block';
 import { Modal } from '../decor/modal/modal';
@@ -81,8 +81,8 @@ export class CoachLessons implements OnInit {
   protected readonly coaches = signal<Coach[]>([]);
 
   protected readonly dayLabels = DAY_LABELS;
-  protected readonly typeLabels = LESSON_TYPE_LABELS;
-  protected readonly locationLabels = LOCATION_LABELS;
+  protected readonly topicLabel = topicLabel;
+  protected readonly locationLabel = locationLabel;
   protected readonly statusLabels = LESSON_STATUS_LABELS;
   protected readonly timeRange = timeRange;
   protected readonly coachName = coachName;
@@ -106,8 +106,8 @@ export class CoachLessons implements OnInit {
       state: stateOf(lesson),
       block: {
         time: timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime)),
-        topic: LESSON_TYPE_LABELS[lesson.topic],
-        location: LOCATION_LABELS[lesson.location],
+        topic: topicLabel(lesson.topic),
+        location: locationLabel(lesson.location),
         details: this.admin
           ? `${coachName(lesson)} · ${participantsLabel(lesson.participantCount)}`
           : lesson.editable

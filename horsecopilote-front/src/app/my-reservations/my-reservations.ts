@@ -26,8 +26,8 @@ import {
   CHANGE_REQUEST_STATUS_LABELS,
   DAY_LABELS,
   LESSON_STATUS_LABELS,
-  LESSON_TYPE_LABELS,
-  LOCATION_LABELS,
+  locationLabel,
+  topicLabel,
   changeRequestLessonLabel,
   dayMonthYearLabel,
   longDateLabel,
@@ -91,8 +91,8 @@ export class MyReservations implements OnInit {
   private loadRequest = 0;
 
   protected readonly dayLabels = DAY_LABELS;
-  protected readonly typeLabels = LESSON_TYPE_LABELS;
-  protected readonly locationLabels = LOCATION_LABELS;
+  protected readonly topicLabel = topicLabel;
+  protected readonly locationLabel = locationLabel;
   protected readonly statusLabels = LESSON_STATUS_LABELS;
   protected readonly requestStatusLabels = CHANGE_REQUEST_STATUS_LABELS;
   protected readonly requestLessonLabel = changeRequestLessonLabel;
@@ -142,8 +142,8 @@ export class MyReservations implements OnInit {
       state: stateOf(lesson),
       block: {
         time: timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime)),
-        topic: LESSON_TYPE_LABELS[lesson.topic],
-        location: LOCATION_LABELS[lesson.location],
+        topic: topicLabel(lesson.topic),
+        location: locationLabel(lesson.location),
         details: lesson.mine ? horseLabel(lesson) : coachName(lesson),
       },
     })),
@@ -214,7 +214,7 @@ export class MyReservations implements OnInit {
     return (
       `${shortDateLabel(parseIsoDate(lesson.startDatetime)!)} ` +
       `${timeRange(timeOf(lesson.startDatetime), timeOf(lesson.endDatetime))} · ` +
-      `${LESSON_TYPE_LABELS[lesson.topic]} · ${coachName(lesson)}`
+      `${topicLabel(lesson.topic)} · ${coachName(lesson)}`
     );
   }
 

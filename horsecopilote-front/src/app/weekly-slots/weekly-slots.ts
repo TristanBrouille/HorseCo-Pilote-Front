@@ -12,23 +12,13 @@ import { CoachesService } from '../coaches/coaches-service';
 import { Badge } from '../decor/badge/badge';
 import { Button } from '../decor/button/button';
 import { Field } from '../decor/field/field';
-import {
-  DAY_LABELS,
-  LESSON_TYPES,
-  LESSON_TYPE_LABELS,
-  LOCATIONS,
-  LOCATION_LABELS,
-  dayMonthYearLabel,
-  levelLabel,
-  timeRange,
-} from '../decor/labels';
+import { DAY_LABELS, dayMonthYearLabel, levelLabel, timeRange } from '../decor/labels';
 import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { Coach } from '../coaches/coachModel';
 import { addDays, parseIsoDate, toIsoDate } from '../coach-lessons/week/week';
 import {
   DayOfWeek,
-  LessonGenerationRequest,
   LessonGenerationResult,
   SlotMember,
   WeeklySlot,
@@ -38,7 +28,7 @@ import { calendarHours, dayColumns } from '../decor/calendar-layout/calendar-lay
 import { WeeklySlotsService } from './weekly-slots-service';
 
 const GENERATION_ERRORS: Record<number, string> = {
-  400: 'Choisissez une date de fin, un sujet et un lieu.',
+  400: 'Choisissez une date de fin.',
   403: 'Seul un administrateur peut générer les leçons.',
   409: "La date de fin doit être comprise entre aujourd'hui et dans un an.",
 };
@@ -100,10 +90,6 @@ export class WeeklySlots implements OnInit {
   protected readonly selectedMemberId = signal<number | null>(null);
   protected readonly memberError = signal<string | null>(null);
 
-  protected readonly lessonTypes = LESSON_TYPES;
-  protected readonly typeLabels = LESSON_TYPE_LABELS;
-  protected readonly locations = LOCATIONS;
-  protected readonly locationLabels = LOCATION_LABELS;
   protected readonly today = toIsoDate(new Date());
   protected readonly maxGenerationDate = toIsoDate(
     new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()),
@@ -113,10 +99,9 @@ export class WeeklySlots implements OnInit {
   protected readonly generationError = signal<string | null>(null);
   protected readonly generationResult = signal<string | null>(null);
 
+  // only the end date: each coach defines the topic and location of their lessons
   protected readonly generationForm = this.fb.group({
     untilDate: this.fb.control(toIsoDate(addDays(new Date(), 28)), Validators.required),
-    topic: this.fb.control<LessonGenerationRequest['topic']>('CSO', Validators.required),
-    location: this.fb.control<LessonGenerationRequest['location']>('CARRIERE', Validators.required),
   });
 
   protected readonly form = this.fb.group({

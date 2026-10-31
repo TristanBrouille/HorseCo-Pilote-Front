@@ -23,6 +23,8 @@ import {
   LOCATION_LABELS,
   horseUnavailabilityLabel,
   levelLabel,
+  locationLabel,
+  topicLabel,
   workloadLabel,
 } from '../../decor/labels';
 import { Coach } from '../../coaches/coachModel';
@@ -42,7 +44,8 @@ const COMMON_ERRORS: Record<number, string> = {
   404: "Cette leçon ou ce participant n'existe plus. Rechargez la page.",
 };
 
-const TOPIC_CONFLICT = "La leçon n'est plus prévue : son sujet ne peut plus être modifié.";
+const DETAILS_CONFLICT =
+  "La leçon n'est plus prévue : son sujet et son lieu ne peuvent plus être modifiés.";
 const LESSON_CONFLICT = 'Ce coach donne déjà une leçon à cet horaire.';
 const HORSE_CONFLICT =
   'Ce cheval ne peut plus être attribué (la leçon ou les plannings ont changé). La liste a été mise à jour.';
@@ -100,58 +103,73 @@ export class LessonEditor {
     computation: () => null,
   });
 
-  protected readonly savingTopic = signal(false);
+  protected readonly savingDetails = signal(false);
   protected readonly options = signal<HorseOption[]>([]);
   protected readonly loadingOptions = signal(false);
   protected readonly chosenHorseId = signal<number | null>(null);
   protected readonly savingHorse = signal(false);
 
+  protected readonly location = linkedSignal(() => this.lesson().location);
   // admin form, reset whenever another (or an updated) lesson is shown
   protected readonly coachId = linkedSignal(() => this.lesson().coach.id);
-  protected readonly location = linkedSignal(() => this.lesson().location);
   protected readonly status = linkedSignal(() => this.lesson().status);
   protected readonly savingLesson = signal(false);
 
-  protected readonly topicChanged = computed(() => this.topic() !== this.lesson().topic);
-  protected readonly lessonChanged = computed(() => {
-    const lesson = this.lesson();
-    return (
-      this.topicChanged() ||
-      this.coachId() !== lesson.coach.id ||
-      this.location() !== lesson.location ||
-      this.status() !== lesson.status
-    );
-  });
+  // generated lessons have neither: the coach must define both before saving
+  protected readonly missingDetails = computed(
+    () => !this.lesson().topic || !this.lesson().location,
+  );
+  protected readonly detailsChanged = computed(
+    () => this.topic() !== this.lesson().topic || this.location() !== this.lesson().location,
+  );
+  protected readonly canSaveDetails = computed(
+    () => this.detailsChanged() && !!this.topic() && !!this.location() && !this.savingDetails(),
+  );
+  protected readonly lessonChanged = computed(
+    () =>
+      this.detailsChanged() ||
+      this.coachId() !== this.lesson().coach.id ||
+      this.status() !== this.lesson().status,
+  );
   protected readonly unassignedCount = computed(
     () => this.participants().filter((participant) => !participant.horse).length,
   );
 
+  // '' = "À définir" (admin only): sent as null
   protected onTopicChange(event: Event) {
-    this.topic.set((event.target as HTMLSelectElement).value as LessonType);
+    this.topic.set(((event.target as HTMLSelectElement).value || null) as LessonType | null);
   }
 
-  protected async saveTopic(): Promise<void> {
-    this.savingTopic.set(true);
+  protected onLocationChange(event: Event) {
+    this.location.set(((event.target as HTMLSelectElement).value || null) as Location | null);
+  }
+
+  protected async saveDetails(): Promise<void> {
+    const topic = this.topic();
+    const location = this.location();
+    if (!topic || !location) {
+      return;
+    }
+    this.savingDetails.set(true);
     this.clearMessages();
     try {
-      const lesson = await this.coachLessonsService.updateTopic(this.lesson().id, {
-        topic: this.topic(),
+      const lesson = await this.coachLessonsService.updateDetails(this.lesson().id, {
+        topic,
+        location,
       });
-      this.notice.set(`Sujet modifié : ${LESSON_TYPE_LABELS[lesson.topic]}.`);
+      this.notice.set(
+        `Leçon mise à jour : ${topicLabel(lesson.topic)} · ${locationLabel(lesson.location)}.`,
+      );
       this.changed.emit(lesson);
     } catch (error) {
-      this.error.set(this.errorMessage(error, TOPIC_CONFLICT));
+      this.error.set(this.errorMessage(error, DETAILS_CONFLICT));
     } finally {
-      this.savingTopic.set(false);
+      this.savingDetails.set(false);
     }
   }
 
   protected onCoachChange(event: Event) {
     this.coachId.set(Number((event.target as HTMLSelectElement).value));
-  }
-
-  protected onLocationChange(event: Event) {
-    this.location.set((event.target as HTMLSelectElement).value as Location);
   }
 
   protected onStatusChange(event: Event) {
