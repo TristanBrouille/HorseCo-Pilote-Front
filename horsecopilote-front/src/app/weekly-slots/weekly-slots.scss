@@ -92,3 +92,43 @@
 .delete-action {
   margin-right: auto;
 }
+
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-3);
+  margin-top: var(--hc-space-6);
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.member-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member-row {
+  display: flex;
+  align-items: center;
+  gap: var(--hc-space-3);
+
+  .hc-body {
+    flex: 1;
+  }
+}
+
+.member-add {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--hc-space-3);
+
+  hc-field {
+    flex: 1;
+  }
+}

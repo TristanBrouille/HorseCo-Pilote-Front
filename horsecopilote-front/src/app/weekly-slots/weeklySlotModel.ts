@@ -11,6 +11,14 @@ export interface WeeklySlot {
   maxCapacity: number;
   requiredLevel: number;
   coach: Coach;
+  enrolledCount: number;
+}
+
+export interface SlotMember {
+  id: number;
+  firstName: string;
+  lastName: string;
+  galopLevel: number;
 }
 
 export interface WeeklySlotRequest {
