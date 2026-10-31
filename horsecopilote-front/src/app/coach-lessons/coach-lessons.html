@@ -1,38 +1,9 @@
 <main class="page">
   <hc-page-header
     title="Agenda de la semaine"
-    subtitle="Toutes les leçons du centre cette semaine. Les vôtres sont mises en avant : cliquez dessus pour voir leurs participants et leurs chevaux."
+    subtitle="Toutes les leçons du centre cette semaine. Les vôtres sont mises en avant : cliquez dessus pour changer leur sujet et attribuer un cheval à chaque participant."
   >
-    <div actions class="week-nav" role="group" aria-label="Changer de semaine">
-      <button
-        hc-button
-        variant="secondary"
-        type="button"
-        aria-label="Semaine précédente"
-        (click)="previousWeek()"
-      >
-        ‹
-      </button>
-      <span class="week-label hc-body-strong" aria-live="polite">Semaine du {{ weekLabel() }}</span>
-      <button
-        hc-button
-        variant="secondary"
-        type="button"
-        aria-label="Semaine suivante"
-        (click)="nextWeek()"
-      >
-        ›
-      </button>
-      <button
-        hc-button
-        variant="ghost"
-        type="button"
-        [disabled]="isCurrentWeek()"
-        (click)="currentWeek()"
-      >
-        Cette semaine
-      </button>
-    </div>
+    <app-week-nav actions [weekStart]="weekStart()" (weekChange)="goToWeek($event)" />
   </hc-page-header>
 
   @if (loadError()) {
@@ -150,16 +121,8 @@
       </div>
     </dl>
 
-    @if (lesson.participants; as participants) {
-      <h3 class="hc-title-2 participants-title">Participants ({{ participants.length }})</h3>
-      <ag-grid-angular
-        class="grid"
-        [theme]="theme"
-        [rowData]="participants"
-        [columnDefs]="participantColumns"
-        [localeText]="participantsLocaleText"
-        domLayout="autoHeight"
-      />
+    @if (lesson.mine && lesson.participants) {
+      <app-lesson-editor [lesson]="lesson" (changed)="onLessonChanged($event)" />
     } @else {
       <hc-callout tone="subtle">
         {{ participantsLabel(lesson.participantCount) }}. Seul le coach de la leçon voit la liste

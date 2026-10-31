@@ -1,0 +1,28 @@
+<button
+  hc-button
+  variant="secondary"
+  type="button"
+  aria-label="Semaine précédente"
+  (click)="previousWeek()"
+>
+  ‹
+</button>
+<span class="week-label hc-body-strong" aria-live="polite">Semaine du {{ weekLabel() }}</span>
+<button
+  hc-button
+  variant="secondary"
+  type="button"
+  aria-label="Semaine suivante"
+  (click)="nextWeek()"
+>
+  ›
+</button>
+<button
+  hc-button
+  variant="ghost"
+  type="button"
+  [disabled]="isCurrentWeek()"
+  (click)="currentWeek()"
+>
+  Cette semaine
+</button>
