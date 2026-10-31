@@ -1,0 +1,57 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-6);
+  padding: var(--hc-page-padding);
+}
+
+.error-banner {
+  margin: 0;
+  padding: var(--hc-space-3) var(--hc-space-4);
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-status-danger-soft);
+  color: var(--hc-status-danger);
+  font: var(--hc-text-body);
+}
+
+.lessons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-5);
+}
+
+.lesson-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-4);
+  padding: var(--hc-space-5);
+  border: 1px solid var(--hc-border-default);
+  border-radius: var(--hc-radius-lg);
+  background: var(--hc-bg-surface);
+
+  &.late {
+    border: 2px solid var(--hc-highlight-late);
+  }
+
+  &.locked {
+    background: var(--hc-bg-disabled);
+  }
+}
+
+.lesson-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--hc-space-3);
+}
+
+.lesson-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--hc-space-1);
+
+  h2,
+  p {
+    margin: 0;
+  }
+}

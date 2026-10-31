@@ -1,5 +1,5 @@
 import { Coach } from '../coaches/coachModel';
-import { Location } from '../horses/horseModel';
+import { HorseStatus, Location } from '../horses/horseModel';
 
 export type LessonType = 'CSO' | 'DRESS' | 'TAP' | 'ETHOLOGIE' | 'MISE_EN_SELLE';
 
@@ -33,4 +33,33 @@ export interface CoachLesson {
   hasPendingMembers: boolean;
   participantCount: number;
   participants: LessonParticipant[] | null;
+}
+
+// PATCH /lessons/{id}
+export interface LessonTopicRequest {
+  topic: LessonType;
+}
+
+// PUT /lessons/{id}/participants/{memberId}/horse
+export interface HorseAssignmentRequest {
+  horseId: number;
+}
+
+// Why a horse cannot be given to the participant (R14 to R19), computed by the back.
+export type HorseUnavailabilityReason =
+  'STATUS' | 'LEVEL' | 'WEIGHT' | 'ALREADY_ASSIGNED' | 'DAILY_HOURS' | 'CONSECUTIVE_HOURS';
+
+// GET /lessons/{id}/participants/{memberId}/horse-options (R20)
+export interface HorseOption {
+  id: number;
+  name: string;
+  breed: string;
+  weightKg: number;
+  requiredLevel: number;
+  status: HorseStatus;
+  dailyHours: number;
+  hoursToday: number;
+  assigned: boolean;
+  selectable: boolean;
+  reason: HorseUnavailabilityReason | null;
 }

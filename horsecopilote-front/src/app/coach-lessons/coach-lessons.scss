@@ -16,18 +16,6 @@
   font: var(--hc-text-body);
 }
 
-.week-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--hc-space-2);
-}
-
-.week-label {
-  min-width: 200px;
-  color: var(--hc-text-primary);
-  text-align: center;
-}
-
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -110,8 +98,4 @@
   dd {
     margin: 0;
   }
-}
-
-.participants-title {
-  margin: 0;
 }

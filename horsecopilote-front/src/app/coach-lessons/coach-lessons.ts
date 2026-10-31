@@ -8,21 +8,15 @@ import {
 } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
 import { Badge } from '../decor/badge/badge';
 import { Button } from '../decor/button/button';
 import { CalendarEntry, calendarHours, dayColumns } from '../decor/calendar-layout/calendar-layout';
 import { Callout } from '../decor/callout/callout';
-import { BadgeCell } from '../decor/grid/badge-cell';
-import { hcGridTheme } from '../decor/grid/hc-grid-theme';
 import {
   DAY_LABELS,
   LESSON_STATUS_LABELS,
   LESSON_TYPE_LABELS,
   LOCATION_LABELS,
-  dayMonthYearLabel,
-  levelLabel,
   longDateLabel,
   shortDateLabel,
   timeRange,
@@ -31,9 +25,11 @@ import { LessonBlock, LessonBlockData, LessonBlockState } from '../decor/lesson-
 import { Modal } from '../decor/modal/modal';
 import { PageHeader } from '../decor/page-header/page-header';
 import { DayOfWeek } from '../weekly-slots/weeklySlotModel';
-import { CoachLesson, LessonParticipant } from './coachLessonModel';
+import { CoachLesson } from './coachLessonModel';
 import { CoachLessonsService } from './coach-lessons-service';
+import { LessonEditor } from './lesson-editor/lesson-editor';
 import { addDays, dayOfWeekOf, mondayOf, parseIsoDate, timeOf, toIsoDate } from './week/week';
+import { WeekNav } from './week-nav/week-nav';
 
 interface LessonEntry extends CalendarEntry {
   lesson: CoachLesson;
@@ -66,7 +62,7 @@ const stateOf = (lesson: CoachLesson): LessonBlockState => {
 
 @Component({
   selector: 'app-coach-lessons',
-  imports: [AgGridAngular, Badge, Button, Callout, LessonBlock, Modal, PageHeader],
+  imports: [Badge, Button, Callout, LessonBlock, LessonEditor, Modal, PageHeader, WeekNav],
   templateUrl: './coach-lessons.html',
   styleUrl: './coach-lessons.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,7 +73,6 @@ export class CoachLessons implements OnInit {
   private readonly router = inject(Router);
   private loadRequest = 0;
 
-  protected readonly theme = hcGridTheme;
   protected readonly dayLabels = DAY_LABELS;
   protected readonly typeLabels = LESSON_TYPE_LABELS;
   protected readonly locationLabels = LOCATION_LABELS;
@@ -86,32 +81,6 @@ export class CoachLessons implements OnInit {
   protected readonly coachName = coachName;
   protected readonly participantsLabel = participantsLabel;
   protected readonly timeLabel = (hour: number) => `${String(hour).padStart(2, '0')}:00`;
-  protected readonly participantsLocaleText = {
-    noRowsToShow: 'Aucun participant validé pour cette leçon.',
-  };
-
-  protected readonly participantColumns: ColDef<LessonParticipant>[] = [
-    {
-      headerName: 'Cavalier',
-      valueGetter: (p) => (p.data ? `${p.data.firstName} ${p.data.lastName}` : ''),
-      cellClass: 'hc-cell-strong',
-      flex: 1.4,
-    },
-    {
-      headerName: 'Niveau',
-      field: 'galopLevel',
-      valueFormatter: (p) => levelLabel(p.value),
-      cellRenderer: BadgeCell,
-      cellRendererParams: { tone: 'brand' },
-      flex: 1,
-    },
-    {
-      headerName: 'Cheval',
-      valueGetter: (p) => p.data?.horse?.name ?? 'Non attribué',
-      cellClassRules: { 'hc-cell-muted': (p) => !p.data?.horse },
-      flex: 1.2,
-    },
-  ];
 
   protected readonly weekStart = signal(mondayOf(new Date()));
   protected readonly lessons = signal<CoachLesson[]>([]);
@@ -119,11 +88,6 @@ export class CoachLessons implements OnInit {
   protected readonly loadError = signal<string | null>(null);
   protected readonly selectedLesson = signal<CoachLesson | null>(null);
   protected detailsOpen = signal(false);
-
-  protected readonly weekLabel = computed(() => dayMonthYearLabel(this.weekStart()));
-  protected readonly isCurrentWeek = computed(
-    () => toIsoDate(this.weekStart()) === toIsoDate(mondayOf(new Date())),
-  );
 
   protected readonly entries = computed<LessonEntry[]>(() =>
     this.lessons().map((lesson) => ({
@@ -168,21 +132,17 @@ export class CoachLessons implements OnInit {
     await this.loadWeek();
   }
 
-  protected async previousWeek(): Promise<void> {
-    await this.goToWeek(addDays(this.weekStart(), -7));
-  }
-
-  protected async nextWeek(): Promise<void> {
-    await this.goToWeek(addDays(this.weekStart(), 7));
-  }
-
-  protected async currentWeek(): Promise<void> {
-    await this.goToWeek(mondayOf(new Date()));
-  }
-
   protected openDetails(lesson: CoachLesson) {
     this.selectedLesson.set(lesson);
     this.detailsOpen.set(true);
+  }
+
+  // The API answers with the updated lesson: refresh the calendar and the open modal.
+  protected onLessonChanged(updated: CoachLesson) {
+    this.lessons.update((lessons) =>
+      lessons.map((lesson) => (lesson.id === updated.id ? updated : lesson)),
+    );
+    this.selectedLesson.set(updated);
   }
 
   protected lessonDate(lesson: CoachLesson): string {
@@ -199,7 +159,7 @@ export class CoachLessons implements OnInit {
     );
   }
 
-  private async goToWeek(monday: Date): Promise<void> {
+  protected async goToWeek(monday: Date): Promise<void> {
     this.weekStart.set(monday);
     await this.router.navigate([], {
       relativeTo: this.route,

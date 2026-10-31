@@ -1,0 +1,63 @@
+<main class="page">
+  <hc-page-header
+    title="Préparation des cours"
+    subtitle="Vos leçons de la semaine : choisissez leur sujet et attribuez un cheval à chaque participant."
+  >
+    <app-week-nav actions [weekStart]="weekStart()" (weekChange)="goToWeek($event)" />
+  </hc-page-header>
+
+  @if (loadError()) {
+    <p class="error-banner" role="alert">{{ loadError() }}</p>
+  }
+
+  @if (ridersWithoutHorse()) {
+    <hc-callout tone="warning" role="status">
+      @if (ridersWithoutHorse() === 1) {
+        1 cavalier n'a pas encore de cheval pour une leçon prévue cette semaine.
+      } @else {
+        {{ ridersWithoutHorse() }} cavaliers n'ont pas encore de cheval pour les leçons prévues
+        cette semaine.
+      }
+    </hc-callout>
+  }
+
+  @if (loading() && !ownLessons().length) {
+    <p class="hc-body hc-muted">Chargement de vos leçons…</p>
+  } @else if (!ownLessons().length && !loadError()) {
+    <p class="hc-body hc-muted">Vous n'avez aucune leçon cette semaine.</p>
+  }
+
+  <div class="lessons" [attr.aria-busy]="loading()">
+    @for (lesson of ownLessons(); track lesson.id) {
+      <article
+        class="lesson-card"
+        [class.late]="lesson.hasPendingMembers"
+        [class.locked]="lesson.status !== 'PREVUE'"
+        [attr.aria-labelledby]="'lesson-' + lesson.id"
+      >
+        <header class="lesson-header">
+          <div class="lesson-title">
+            <h2 class="hc-title-2" [id]="'lesson-' + lesson.id">
+              {{ lessonDate(lesson) }} · {{ lessonTime(lesson) }}
+            </h2>
+            <p class="hc-body hc-muted">
+              {{ typeLabels[lesson.topic] }} · {{ locationLabels[lesson.location] }}
+            </p>
+          </div>
+          <hc-badge [tone]="statusLabels[lesson.status].tone">
+            {{ statusLabels[lesson.status].label }}
+          </hc-badge>
+        </header>
+
+        @if (lesson.hasPendingMembers) {
+          <hc-callout tone="late">
+            Des membres se sont inscrits au créneau après la création de cette leçon : ils ne
+            figurent pas encore parmi les participants.
+          </hc-callout>
+        }
+
+        <app-lesson-editor [lesson]="lesson" (changed)="onLessonChanged($event)" />
+      </article>
+    }
+  </div>
+</main>

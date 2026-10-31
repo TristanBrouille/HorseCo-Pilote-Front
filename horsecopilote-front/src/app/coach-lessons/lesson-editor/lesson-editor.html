@@ -1,0 +1,127 @@
+@if (error()) {
+  <p class="message error hc-body" role="alert">{{ error() }}</p>
+}
+<p class="message notice hc-body" role="status">{{ notice() }}</p>
+
+@if (editable()) {
+  <div class="topic">
+    <hc-field label="Sujet de la leçon">
+      <select [disabled]="savingTopic()" (change)="onTopicChange($event)">
+        @for (type of lessonTypes; track type) {
+          <option [value]="type" [selected]="type === topic()">{{ typeLabels[type] }}</option>
+        }
+      </select>
+    </hc-field>
+    <button
+      hc-button
+      variant="secondary"
+      type="button"
+      [disabled]="!topicChanged() || savingTopic()"
+      (click)="saveTopic()"
+    >
+      Modifier le sujet
+    </button>
+  </div>
+} @else {
+  <hc-callout tone="subtle">{{ lockedReason() }}</hc-callout>
+}
+
+<div class="participants-header">
+  <h3 class="hc-title-2">Participants ({{ participants().length }})</h3>
+  @if (editable() && unassignedCount()) {
+    <hc-badge tone="warning"> {{ unassignedCount() }} sans cheval </hc-badge>
+  }
+</div>
+
+@if (!participants().length) {
+  <p class="hc-body hc-muted empty">Aucun participant validé pour cette leçon.</p>
+}
+
+<ul class="participants">
+  @for (participant of participants(); track participant.id) {
+    <li class="participant" [class.picking]="pickingFor()?.id === participant.id">
+      <div class="row">
+        <div class="who">
+          <span class="hc-body-strong">{{ fullName(participant) }}</span>
+          <hc-badge tone="brand">{{ levelLabel(participant.galopLevel) }}</hc-badge>
+        </div>
+        <span class="horse hc-body" [class.missing]="!participant.horse">
+          {{ participant.horse?.name ?? 'Non attribué' }}
+        </span>
+        @if (editable() && pickingFor()?.id !== participant.id) {
+          <button
+            hc-button
+            variant="ghost"
+            type="button"
+            [attr.aria-label]="
+              (participant.horse ? 'Changer le cheval de ' : 'Choisir un cheval pour ') +
+              fullName(participant)
+            "
+            (click)="openPicker(participant)"
+          >
+            {{ participant.horse ? 'Changer' : 'Choisir un cheval' }}
+          </button>
+        }
+      </div>
+
+      @if (pickingFor()?.id === participant.id) {
+        <div class="picker">
+          <p class="hc-label" [id]="'picker-' + lesson().id + '-' + participant.id">
+            Cheval de {{ fullName(participant) }}
+          </p>
+          @if (loadingOptions()) {
+            <p class="hc-body hc-muted">Chargement des chevaux…</p>
+          } @else {
+            <div
+              class="options"
+              role="radiogroup"
+              [attr.aria-labelledby]="'picker-' + lesson().id + '-' + participant.id"
+            >
+              @for (option of options(); track option.id) {
+                <hc-horse-option
+                  [group]="'horse-' + lesson().id + '-' + participant.id"
+                  [name]="option.name"
+                  [details]="optionDetails(option)"
+                  [workload]="optionWorkload(option)"
+                  [selectable]="option.selectable"
+                  [reason]="optionReason(option)"
+                  [selected]="chosenHorseId() === option.id"
+                  (select)="chosenHorseId.set(option.id)"
+                />
+              }
+            </div>
+          }
+          <div class="picker-actions">
+            @if (participant.horse) {
+              <button
+                hc-button
+                variant="ghost"
+                type="button"
+                class="unassign"
+                [disabled]="savingHorse()"
+                (click)="unassign(participant)"
+              >
+                Retirer le cheval
+              </button>
+            }
+            <button hc-button variant="secondary" type="button" (click)="closePicker()">
+              Annuler
+            </button>
+            <button
+              hc-button
+              type="button"
+              [disabled]="
+                chosenHorseId() === null ||
+                chosenHorseId() === participant.horse?.id ||
+                savingHorse()
+              "
+              (click)="assign(participant)"
+            >
+              Attribuer le cheval
+            </button>
+          </div>
+        </div>
+      }
+    </li>
+  }
+</ul>

@@ -38,6 +38,12 @@ export const routes: Routes = [
         canActivate: [coachGuard],
       },
       {
+        path: 'coach/preparation',
+        loadComponent: () =>
+          import('./coach-lessons/preparation/preparation').then((m) => m.Preparation),
+        canActivate: [coachGuard],
+      },
+      {
         path: 'membre/cours',
         loadComponent: () =>
           import('./my-reservations/my-reservations').then((m) => m.MyReservations),
